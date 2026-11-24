@@ -12,7 +12,7 @@
 <meta name="description" content="Absalam DIG 206 MCQ Bank — Physiology, Anatomy & Histology practice questions with verified Department Book answers">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <title>Absalam — DIG 206 MCQ Bank</title>
 <script>try{localStorage.getItem('x')}catch(e){try{var m={};Object.defineProperty(window,'localStorage',{value:{getItem:function(k){return k in m?m[k]:null},setItem:function(k,v){m[k]=String(v)},removeItem:function(k){delete m[k]}}})}catch(e2){}}
 document.documentElement.dataset.theme='dark';try{var t=localStorage.getItem('dig_mcq_theme_v1');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
@@ -293,6 +293,24 @@ main{padding:0 16px 80px}
 .adgate .msg{margin:8px 0 0;font:500 12px var(--ui);color:var(--bad)}
 #absToast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font:600 13px var(--ui);transition:.25s;z-index:99;max-width:92vw;text-align:center}
 #absToast.on{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:980px){
+body.collapsed .side{overflow-x:hidden;overflow-y:auto;padding-left:14px;padding-right:14px;border-right:1px solid var(--line)}
+.side{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;height:100vh;height:100dvh;max-height:100dvh}
+#scrim{touch-action:none}
+html:has(body.nav),body.nav{overflow:hidden;overscroll-behavior:none}
+body.nav{position:fixed;inset:0;width:100%}
+}
+
+
+.dk{margin-top:14px;padding-top:11px;border-top:1px dashed var(--line);text-align:center;animation:dkin .5s ease-out both}
+.dk .ar{display:block;font:400 22px/1.65 Amiri,"Noto Naskh Arabic","Traditional Arabic","Geeza Pro",serif;color:var(--ink);direction:rtl}
+.dk .tr{display:block;margin-top:1px;font:500 11.5px/1.4 var(--ui);color:var(--mut)}
+.dk .tr b{font-weight:700;color:var(--pri)}
+body.nodk .dk{display:none}
+@keyframes dkin{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.dk{animation:none}}
+@media print{.dk{display:none}}
 </style>
 </head>
 <body>
@@ -301,7 +319,7 @@ main{padding:0 16px 80px}
 <div class="brand" aria-label="Absalam"><div class="logo" aria-hidden="true"><svg viewBox="0 0 52 52" aria-hidden="true"><defs><linearGradient id="absGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e07b1f"/><stop offset=".52" stop-color="#2f6fd0"/><stop offset="1" stop-color="#8a4fd3"/></linearGradient></defs><rect x="1.5" y="1.5" width="49" height="49" rx="15" fill="url(#absGrad)"/><path d="M10 8 Q26 1 42 8" stroke="#fff" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><text x="26" y="35" text-anchor="middle" font-family="Literata, Georgia, serif" font-size="29" font-weight="700" fill="#fff">A</text><circle cx="19" cy="42.5" r="2.3" fill="#fff" fill-opacity=".95"/><circle cx="26" cy="42.5" r="2.3" fill="#fff" fill-opacity=".95"/><circle cx="33" cy="42.5" r="2.3" fill="#fff" fill-opacity=".95"/></svg></div><div><h1>Absalam<span class="brand-dot">.</span></h1></div><button class="side-x" id="sideX" aria-label="Close menu" title="Close menu (m)">✕</button></div>
 <div class="srcbox"><div class="gh">Subject</div><div class="seg" id="subj"><button data-subject="phys">Physiology</button><button data-subject="anat">Anatomy</button><button data-subject="histo">Histology</button></div></div><div class="srcbox"><div class="gh">Source of questions</div><div class="chips" id="mode" role="group" aria-label="Source of questions"></div></div>
 <nav id="nav" aria-label="Topics and subtopics"></nav>
-<div class="tools"><button class="btn" id="revealAll">Reveal all</button><button class="btn" id="hideAll">Hide all</button><button class="btn" id="clearBm">Clear bookmarks</button><button class="btn" id="resetBtn">Reset progress</button><div class="resetbox" id="resetBox" hidden><button class="btn" data-r="sec">Reset this section</button><button class="btn" data-r="all">Reset everything</button><button class="btn" data-r="no">Cancel</button></div><div class="ankiExportPack"><button class="btn" id="ankiExportBtn" type="button" title="Choose subjects and chapters, then export to Anki">⇩ Choose &amp; export for Anki (.txt)</button><p class="ankiExportNote" id="ankiExportNote">Choose subjects and chapters before exporting</p></div></div>
+<div class="tools"><button class="btn" id="revealAll">Reveal all</button><button class="btn" id="hideAll">Hide all</button><button class="btn" id="dhikrBtn">Show / hide dhikr</button><button class="btn" id="clearBm">Clear bookmarks</button><button class="btn" id="resetBtn">Reset progress</button><div class="resetbox" id="resetBox" hidden><button class="btn" data-r="sec">Reset this section</button><button class="btn" data-r="all">Reset everything</button><button class="btn" data-r="no">Cancel</button></div><div class="ankiExportPack"><button class="btn" id="ankiExportBtn" type="button" title="Choose subjects and chapters, then export to Anki">⇩ Choose &amp; export for Anki (.txt)</button><p class="ankiExportNote" id="ankiExportNote">Choose subjects and chapters before exporting</p></div></div>
 <p class="save">Progress is saved on this device.</p>
 <dl class="keys"><dt><kbd>j</kbd><kbd>k</kbd></dt><dd>Next, previous</dd><dt><kbd>a</kbd>–<kbd>e</kbd></dt><dd>Choose an answer</dd><dt><kbd>r</kbd></dt><dd>Reveal or hide answer</dd><dt><kbd>x</kbd></dt><dd>Show explanation</dd><dt><kbd>b</kbd></dt><dd>Bookmark</dd><dt><kbd>/</kbd></dt><dd>Search</dd><dt><kbd>m</kbd></dt><dd>Show or hide menu</dd></dl>
 </aside>
@@ -1104,6 +1122,9 @@ let clr=0;$('#clearBm').addEventListener('click',e=>{
  clr=0;bm.clear();sv(BK,[]);b.textContent='Clear bookmarks';render();
 });
 const mob=()=>matchMedia('(max-width:980px)').matches;
+var __sy=0;window.addEventListener('scroll',function(){if(!document.body.classList.contains('nav'))__sy=window.scrollY},{passive:true});
+function __lock(){var B=document.body;if(B.classList.contains('nav')){if(!B.style.top)B.style.top='-'+__sy+'px'}else if(B.style.top){B.style.top='';window.scrollTo({top:__sy,behavior:'instant'})}}
+new MutationObserver(__lock).observe(document.body,{attributes:true,attributeFilter:['class']});
 function toggleMenu(force){const B=document.body;if(mob())B.classList.toggle('nav',force);else{B.classList.toggle('collapsed',force===undefined?undefined:!force);sv('dig_mcq_menu_v1',B.classList.contains('collapsed'))}}
 if(ld('dig_mcq_menu_v1',false))document.body.classList.add('collapsed');
 $('#navBtn').addEventListener('click',()=>toggleMenu());
@@ -1342,17 +1363,60 @@ function watchAd(done,fail){
  Promise.resolve(p).then(function(){done()},function(){fail('Ad could not be shown. Try again, or share the question instead.')});
 }
 
-/* ---- Share a question: Telegram confirms the message was really sent (needs the Worker) ---- */
+/* ---- Share a question: picture card + tags; Telegram confirms the message was really sent ---- */
+function cardBlob(q,tags){
+ return new Promise(function(res){
+  var W=1080,M=60,cv=document.createElement('canvas'),c=cv.getContext('2d');
+  var UI='"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif',SER='Literata,Georgia,"Times New Roman",serif';
+  var TC={yr:['#1d5eb0','#e3eefb'],dep:['#0b6465','#dff1f0'],tsrc:['#7842b5','#efe6f8'],c:['#cf3f2e','#fdeae6'],dsp:['#b05a05','#fdf0dc']};
+  var subj='';try{subj=({phys:'Physiology',anat:'Anatomy',histo:'Histology'})[st.subject]||''}catch(e){}
+  var stem=String(q.stem).replace(/<[^>]*>/g,''),opts=(q.options||[]).map(function(o,i){return String(o).replace(/<[^>]*>/g,'')});
+  function rr(x,y,w,h,r){c.beginPath();if(c.roundRect)c.roundRect(x,y,w,h,r);else c.rect(x,y,w,h)}
+  function wrap(t,font,w){c.font=font;var ws=t.split(/\s+/),L=[],l='';ws.forEach(function(x){var s=l?l+' '+x:x;if(c.measureText(s).width>w&&l){L.push(l);l=x}else l=s});L.push(l);return L}
+  var FS='600 40px '+SER,FO='500 32px '+UI;
+  function paint(d){
+   var y=190;
+   if(d){var g=c.createLinearGradient(0,0,W,190);g.addColorStop(0,'#0a5758');g.addColorStop(1,'#12908b');c.fillStyle=g;c.fillRect(0,0,W,190);
+    c.fillStyle='rgba(255,255,255,.07)';c.beginPath();c.arc(W-70,20,150,0,7);c.fill();c.beginPath();c.arc(W-230,190,90,0,7);c.fill();
+    var lg=c.createLinearGradient(M,50,M+90,140);lg.addColorStop(0,'#e07b1f');lg.addColorStop(.52,'#2f6fd0');lg.addColorStop(1,'#8a4fd3');c.fillStyle=lg;rr(M,50,90,90,26);c.fill();
+    c.fillStyle='#fff';c.font='800 56px '+UI;c.textAlign='center';c.fillText('A',M+45,115);c.textAlign='left';
+    c.font='800 44px '+UI;c.fillText('Absalam',M+116,92);c.font='500 26px '+UI;c.fillStyle='rgba(255,255,255,.82)';c.fillText('DIG 206'+(subj?' · '+subj:'')+' · MCQ Bank',M+116,128);
+    var id=String(q.num||'');c.font='700 28px '+UI;var iw=c.measureText(id).width+44;c.fillStyle='rgba(255,255,255,.18)';rr(W-M-iw,68,iw,52,26);c.fill();c.fillStyle='#fff';c.fillText(id,W-M-iw+22,104)}
+   y+=38;
+   if(tags.length){var x=M;c.font='700 24px '+UI;tags.slice(0,7).forEach(function(t){var lab=String(t[0]),col=TC[t[1]]||['#0b6465','#dff1f0'],w=c.measureText(lab).width+34;if(x+w>W-M)return;if(d){c.fillStyle=col[1];rr(x,y,w,48,24);c.fill();c.fillStyle=col[0];c.fillText(lab,x+17,y+32)}x+=w+12});y+=48+34}
+   var L=wrap(stem,FS,W-2*M);
+   if(d){c.fillStyle='#1a2330';c.font=FS;L.forEach(function(l,k){c.fillText(l,M,y+40+k*58)})}
+   y+=L.length*58+34;
+   opts.forEach(function(o,i){var OL=wrap(o,FO,W-2*M-130),h=OL.length*44+48;
+    if(d){c.save();c.shadowColor='rgba(26,35,48,.10)';c.shadowBlur=18;c.shadowOffsetY=6;c.fillStyle='#fff';rr(M,y,W-2*M,h,24);c.fill();c.restore();c.strokeStyle='#e2ded4';c.lineWidth=2;rr(M,y,W-2*M,h,24);c.stroke();
+     c.fillStyle='#e0f1f0';c.beginPath();c.arc(M+52,y+h/2,28,0,7);c.fill();c.fillStyle='#0b6465';c.font='800 30px '+UI;c.textAlign='center';c.fillText('ABCDEF'.charAt(i),M+52,y+h/2+11);c.textAlign='left';
+     c.fillStyle='#1a2330';c.font=FO;OL.forEach(function(l,k){c.fillText(l,M+102,y+24+36+k*44-8)})}
+    y+=h+20});
+   y+=22;
+   if(d){var fg=c.createLinearGradient(M,y,W-M,y+196);fg.addColorStop(0,'#0f1d2b');fg.addColorStop(1,'#0e3a40');c.fillStyle=fg;rr(M,y,W-2*M,196,32);c.fill();
+    c.fillStyle='#7fd6d0';c.font='700 26px '+UI;c.fillText('THINK YOU KNOW IT?',M+44,y+58);
+    c.fillStyle='#fff';c.font='800 44px '+UI;c.fillText('Solve it in @'+BOT,M+44,y+118);
+    c.fillStyle='#8fa3ad';c.font='500 24px '+UI;c.fillText('Answer + explanation inside',M+44,y+160)}
+   return y+196+M;
+  }
+  cv.width=W;cv.height=10;var H=paint(false);cv.width=W;cv.height=H;
+  c.fillStyle='#f3f1ec';c.fillRect(0,0,W,H);paint(true);
+  cv.toBlob(res,'image/jpeg',0.9);
+ });
+}
+function blobB64(b){return new Promise(function(res){if(!b)return res(null);var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]||null)};r.onerror=function(){res(null)};r.readAsDataURL(b)})}
 function shareCard(q,done,fail){
  var tg=window.Telegram&&Telegram.WebApp;
  if(!tg||!tg.initData||typeof tg.shareMessage!=='function'){fail('Sharing works inside the Telegram app only. Use the ad option instead.');return}
  if(!BACKEND){fail('Sharing is not set up yet. Use the ad option instead.');return}
- var ctl=window.AbortController?new AbortController():null,to=setTimeout(function(){ctl&&ctl.abort()},10000);
- fetch(BACKEND+'/prepare',{method:'POST',headers:{'content-type':'application/json'},signal:ctl&&ctl.signal,
-  body:JSON.stringify({initData:tg.initData,q:{num:q.num,stem:q.stem,options:q.options}})})
- .then(function(r){return r.json()}).then(function(j){clearTimeout(to);if(!j.id)throw 0;
+ var tags=[];try{if(typeof tagsOf==='function')tags=tagsOf(q)}catch(e){}
+ cardBlob(q,tags).then(blobB64,function(){return null}).then(function(img){
+  var ctl=window.AbortController?new AbortController():null,to=setTimeout(function(){ctl&&ctl.abort()},15000);
+  return fetch(BACKEND+'/prepare',{method:'POST',headers:{'content-type':'application/json'},signal:ctl&&ctl.signal,
+   body:JSON.stringify({initData:tg.initData,q:{num:q.num,stem:q.stem,options:q.options,tags:tags.map(function(t){return t[0]})},img:img})}).then(function(r){clearTimeout(to);return r.json()});
+ }).then(function(j){if(!j.id)throw 0;
   tg.shareMessage(j.id,function(sent){sent?done():fail('Not sent — the unlock only works after you send the message to a chat or group.')})})
- .catch(function(){clearTimeout(to);fail('Could not prepare the share. Try again, or use the ad option.')});
+ .catch(function(){fail('Could not prepare the share. Try again, or use the ad option.')});
 }
 
 /* ---- Gate on the Explanation button ---- */
@@ -1387,6 +1451,74 @@ if(typeof _grade==='function')window.grade=function(el,q){
   if(n%INAPP_EVERY===0&&typeof window[ZONE]==='function')window[ZONE]({type:'inApp',inAppSettings:{frequency:1,capping:0.05,interval:30,timeout:3,everyPage:false}})}}catch(e){}
  return r;
 };
+})();
+</script>
+<script id="absDhikrJs">
+(function(){'use strict';
+/* [Arabic, transliteration, meaning] */
+var ANY=[
+['سُبْحَانَ اللَّهِ','SubhanAllah','Glory be to Allah'],
+['الْحَمْدُ لِلَّهِ','Alhamdulillah','All praise is for Allah'],
+['اللَّهُ أَكْبَرُ','Allahu Akbar','Allah is the Greatest'],
+['لَا إِلَٰهَ إِلَّا اللَّهُ','La ilaha illa Allah','There is no god but Allah'],
+['أَسْتَغْفِرُ اللَّهَ','Astaghfirullah','I seek forgiveness from Allah'],
+['سُبْحَانَ اللَّهِ وَبِحَمْدِهِ','SubhanAllahi wa bihamdih','Glory and praise be to Allah'],
+['سُبْحَانَ اللَّهِ الْعَظِيمِ','SubhanAllahil ‘Azeem','Glory be to Allah, the Almighty'],
+['لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ','La hawla wa la quwwata illa billah','There is no power and no strength except with Allah'],
+['حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ','Hasbunallahu wa ni‘mal wakil','Allah is enough for us, and the best Disposer of affairs'],
+['صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ','Sallallahu ‘alayhi wa sallam','Peace and blessings be upon him ﷺ'],
+['الْحَمْدُ لِلَّهِ عَلَىٰ كُلِّ حَالٍ','Alhamdulillahi ‘ala kulli hal','Praise be to Allah in every circumstance'],
+['يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ','Ya Hayyu ya Qayyum, bi-rahmatika astagheeth','O Ever-Living, O Sustainer, in Your mercy I seek relief']
+];
+var KNOW=[
+['رَّبِّ زِدْنِي عِلْمًا','Rabbi zidni ‘ilma','My Lord, increase me in knowledge · Qur’an 20:114'],
+['رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي','Rabbi ishrah li sadri wa yassir li amri','My Lord, expand my chest and ease my task for me · Qur’an 20:25–26'],
+['اللَّهُمَّ انْفَعْنِي بِمَا عَلَّمْتَنِي','Allahumma infa‘ni bima ‘allamtani','O Allah, benefit me with what You have taught me'],
+['اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا','Allahumma inni as’aluka ‘ilman nafi‘a','O Allah, I ask You for beneficial knowledge'],
+['اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا','Allahumma la sahla illa ma ja‘altahu sahla','O Allah, nothing is easy except what You make easy']
+];
+var OK=[
+['الْحَمْدُ لِلَّهِ','Alhamdulillah','All praise is for Allah'],
+['مَا شَاءَ اللَّهُ','Masha’Allah','What Allah has willed'],
+['وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ','Wa ma tawfiqi illa billah','My success is only through Allah · Qur’an 11:88'],
+['سُبْحَانَ اللَّهِ وَبِحَمْدِهِ','SubhanAllahi wa bihamdih','Glory and praise be to Allah']
+];
+var MISS=[
+['إِنَّ مَعَ الْعُسْرِ يُسْرًا','Inna ma‘al ‘usri yusra','Indeed, with hardship comes ease · Qur’an 94:6'],
+['رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَّسِينَا أَوْ أَخْطَأْنَا','Rabbana la tu’akhidhna in nasina aw akhta’na','Our Lord, do not hold us accountable if we forget or make a mistake · Qur’an 2:286'],
+['رَّبِّ زِدْنِي عِلْمًا','Rabbi zidni ‘ilma','My Lord, increase me in knowledge · Qur’an 20:114'],
+['أَسْتَغْفِرُ اللَّهَ','Astaghfirullah','I seek forgiveness from Allah'],
+['لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ','La hawla wa la quwwata illa billah','There is no power and no strength except with Allah']
+];
+var UNSURE=[
+['اللَّهُ أَعْلَمُ','Allahu a‘lam','Allah knows best'],
+['رَّبِّ زِدْنِي عِلْمًا','Rabbi zidni ‘ilma','My Lord, increase me in knowledge · Qur’an 20:114']
+];
+var KEY='dig_mcq_dhikr_off_v2';
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
+if(ls(KEY)==='1')document.body.classList.add('nodk');
+var b=document.getElementById('dhikrBtn');
+if(b)b.addEventListener('click',function(){var h=document.body.classList.toggle('nodk');ls(KEY,h?'1':'0')});
+
+/* shuffle-bag per pool: no repeats until every phrase has been shown */
+var bags=new Map(),lastKey='';
+function pick(pool){var bag=bags.get(pool);if(!bag||!bag.length){bag=pool.map(function(_,i){return i});for(var i=bag.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=bag[i];bag[i]=bag[j];bag[j]=t}
+  if(pool[bag[bag.length-1]][1]===lastKey&&bag.length>1)bag.unshift(bag.pop());bags.set(pool,bag)}
+ var d=pool[bag.pop()];lastKey=d[1];return d}
+function mix(a,b){return Math.random()<0.7?a:b}
+function add(el,kind){
+ var bd=el&&el.querySelector('.bd');if(!bd||bd.querySelector('.dk'))return;
+ var pool=kind==='ok'?mix(OK,ANY):kind==='miss'?mix(MISS,KNOW):kind==='unsure'?UNSURE:mix(KNOW,ANY);
+ var d=pick(pool),box=document.createElement('div');box.className='dk';box.setAttribute('role','note');
+ var a=document.createElement('span');a.className='ar';a.lang='ar';a.dir='rtl';a.textContent=d[0];
+ var t=document.createElement('span');t.className='tr';var bb=document.createElement('b');bb.textContent=d[1];t.appendChild(bb);t.appendChild(document.createTextNode(' — '+d[2]));
+ box.appendChild(a);box.appendChild(t);bd.appendChild(box)}
+function wrap(name,fn){var o=window[name];if(typeof o!=='function')return;window[name]=function(el,q){var r=o.apply(this,arguments);try{fn.apply(null,arguments)}catch(e){}return r}}
+wrap('grade',function(el,q){if(!el.classList.contains('graded'))return;
+ if(q&&q.answer===-1)return add(el,'unsure');
+ add(el,el.querySelector('.opt.wrong')?'miss':'ok')});
+wrap('reveal',function(el,q,quiet){if(!quiet)add(el,'any')});
+wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
 })();
 </script>
 </body>

@@ -909,7 +909,7 @@ const card=(q,n)=>`<article class="q ${CL[q.topic]}" id="${q.num}" data-num="${q
 <div class="bd"><div class="sb"><span class="tags">${tagsOf(q).map(([v,k])=>`<span class="tg ${k}">${v}</span>`).join('')}</span></div><p class="stem">${hl(q.stem)}</p>
 ${q.image?`<img class="qimage" src="${q.image}" alt="${esc(q.image_alt||'Question figure')}">`:''}
 <ol class="opts">${q.options.map((o,i)=>`<li class="opt" data-i="${i}" tabindex="0" role="button"><b>${L(i)}</b><span>${hl(o)}</span><em class="tk"></em></li>`).join('')}</ol>
-<div class="acts"><button class="btn pri" data-a="ans">${q.answer===-1?'Unkeyed — review':'Reveal'}</button><button class="btn" data-a="exp">Explanation</button><button class="chk" data-a="bm" aria-pressed="false">☆ Bookmark</button><button class="btn" data-a="rep">Report</button></div>
+<div class="acts"><button class="btn pri" data-a="ans">${q.answer===-1?'Unkeyed — review':'Reveal'}</button><button class="btn" data-a="exp">Explanation</button><button class="chk" data-a="bm" aria-pressed="false">☆ Bookmark</button><button class="btn" data-share="1" title="Send this question to a group">📤 Share</button><button class="btn" data-a="rep">Report</button></div>
 <div class="expl"></div></div></article>`;
 const tagOf=(num,own)=>{const z=ALL.find(o=>o.num===num)||{};const src=(own&&own.length?own:z.sources)||[];const ys=yearsOf({sources:src,histo:z.histo,anat:z.anat,num:'__tag'});const isDep=x=>!/^DIG 206 Dept Book p\./.test(x)&&/\bDEP\b|Dept\.? Book|\bDepartment\b/i.test(x);const dep=src.some(isDep);let dy='';for(const x of src){const m=x.match(/Department\s+(20\d{2})/i);if(m){dy=' '+m[1];break}}const parts=[];if(ys.length)parts.push('Exam '+ys.join(' · '));if(dep)parts.push('DEP'+dy);if(!parts.length){const o=src.filter(x=>!/Dept Book p\./.test(x)).map(x=>x.replace(/\s*Q\d+\s*$/,'')).slice(0,2);parts.push(o.length?o.join(' · '):'Year not recorded')}return parts.join(' + ')};
 const mergedFormDetails=q=>{
@@ -1415,9 +1415,97 @@ function shareCard(q,done,fail){
   return fetch(BACKEND+'/prepare',{method:'POST',headers:{'content-type':'application/json'},signal:ctl&&ctl.signal,
    body:JSON.stringify({initData:tg.initData,q:{num:q.num,stem:q.stem,options:q.options,tags:tags.map(function(t){return t[0]})},img:img})}).then(function(r){clearTimeout(to);return r.json()});
  }).then(function(j){if(!j.id)throw 0;
-  tg.shareMessage(j.id,function(sent){sent?done():fail('Not sent — the unlock only works after you send the message to a chat or group.')})})
+  tg.shareMessage(j.id,function(sent){sent?done():fail('Not sent — this group may block bots, so it cannot count. Use the group option, pick another group, or watch the ad.')})})
  .catch(function(){fail('Could not prepare the share. Try again, or use the ad option.')});
 }
+
+/* ---- Share: picture card (inline) + text-and-link route that works in groups that block bots ---- */
+function qLink(q){return 'https://t.me/'+BOT+'?startapp='+encodeURIComponent(String(q.num))}
+function qText(q){var L='ABCDEFGH',t=String(q.stem||'').replace(/\s+/g,' ').trim();if(t.length>350)t=t.slice(0,347)+'\u2026';
+ var o=(q.options||[]).slice(0,8).map(function(x,i){return L[i]+') '+String(x).replace(/\s+/g,' ').trim()}).join('\n');
+ return '\ud83e\udde0 '+t+'\n\n'+o+'\n\n\ud83d\udc49 Answer + explanation in @'+BOT}
+function shareText(q){var w=window.Telegram&&Telegram.WebApp,u=qLink(q),
+ s='https://t.me/share/url?url='+encodeURIComponent(u)+'&text='+encodeURIComponent(qText(q));
+ try{if(w&&w.initData&&typeof w.openTelegramLink==='function'){w.openTelegramLink(s);return true}}catch(e){}
+ try{navigator.clipboard.writeText(qText(q)+'\n'+u);toast('Copied \u2014 paste it in any chat');return true}catch(e){}
+ return false}
+function closeShare(){var o=document.getElementById('absShare');if(o)o.remove()}
+function apiPost(path,obj){return fetch(BACKEND+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(obj)}).then(function(r){return r.json()})}
+var GROUP_ERR={
+ bot_not_in_group:'The bot is not in that group yet. Tap \u201cAdd the bot to a group\u201d, then try again.',
+ no_rights:'The bot is muted in that group. A group admin must let it send messages.',
+ not_in_group:'You are not a member of that group.',
+ busy:'Too many shares in a short time. Wait a minute and try again.',
+ error:'Telegram refused the post. Try another group.'};
+/* Bot posts the card into the group itself and Telegram confirms it back: works in groups that block inline bots. */
+function shareGroup(q,done,fail){
+ var tg=window.Telegram&&Telegram.WebApp;
+ if(!tg||!tg.initData||!BACKEND){fail('Open the app inside Telegram to post to a group.');return}
+ if(typeof tg.requestChat!=='function'||(tg.isVersionAtLeast&&!tg.isVersionAtLeast('9.6'))){fail('NOCHAT');return}
+ var tags=[];try{if(typeof tagsOf==='function')tags=tagsOf(q)}catch(e){}
+ cardBlob(q,tags).then(blobB64,function(){return null}).then(function(img){
+  return apiPost('/picker',{initData:tg.initData,q:{num:q.num,stem:q.stem,options:q.options,tags:tags.map(function(t){return t[0]})},img:img})
+ }).then(function(j){
+  if(!j||!j.id){fail('NOCHAT');return}
+  var chosen=false,tries=0,max=0;
+  function tick(){
+   apiPost('/status',{initData:tg.initData,rid:j.rid}).then(function(r){
+    if(r.state==='ok'){done(r.title||'');return}
+    if(r.state==='fail'){fail(GROUP_ERR[r.code]||GROUP_ERR.error);return}
+    again()},again)}
+  function again(){if(++tries>=max){fail(chosen?'Telegram did not confirm the post. Try again.':'Cancelled \u2014 pick a group to post to.');return}setTimeout(tick,1000)}
+  tg.requestChat(j.id,function(ok){chosen=!!ok;max=ok?25:4;tick()});
+ }).catch(function(){fail('Could not reach the server. Try again.')});
+}
+function shareSheet(q){
+ closeShare();
+ var d=document.createElement('div');d.id='absShare';
+ d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center';
+ d.innerHTML='<div role="dialog" aria-label="Share question" style="width:100%;max-width:480px;box-sizing:border-box;background:var(--card,Canvas);color:var(--ink,CanvasText);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 30px rgba(0,0,0,.3)">'
+  +'<b style="font-size:16px">Share this question</b>'
+  +'<div style="display:grid;gap:8px;margin:12px 0 8px">'
+  +'<button class="btn pri" data-sh="grp">\ud83d\udce3 Post to a group</button>'
+  +'<button class="btn" data-sh="add">\u2795 Add the bot to a group <span style="opacity:.7">(first time only)</span></button>'
+  +'<button class="btn" data-sh="pic">\ud83d\uddbc\ufe0f Picture via Telegram dialog</button>'
+  +'<button class="btn" data-sh="txt">\ud83d\udcac Text + link <span style="opacity:.7">(any group, no picture)</span></button>'
+  +'<button class="btn" data-sh="x">Cancel</button></div>'
+  +'<div class="msg" data-sh-msg hidden style="font-size:13px;line-height:1.4"></div></div>';
+ document.body.appendChild(d);
+ var msg=d.querySelector('[data-sh-msg]');
+ function say(t){msg.textContent=t;msg.hidden=false}
+ d.addEventListener('click',function(e){
+  if(e.target===d){closeShare();return}
+  var b=e.target.closest('button[data-sh]');if(!b)return;
+  var k=b.dataset.sh,w=window.Telegram&&Telegram.WebApp;
+  if(k==='x'){closeShare();return}
+  if(k==='add'){try{w.openTelegramLink('https://t.me/'+BOT+'?startgroup=true')}catch(x){say('Open https://t.me/'+BOT+'?startgroup=true in Telegram.')}return}
+  if(k==='txt'){if(shareText(q))closeShare();else say('Could not open Telegram share here.');return}
+  b.disabled=true;msg.hidden=true;
+  if(k==='grp'){shareGroup(q,function(title){closeShare();toast('Posted'+(title?' to \u201c'+title+'\u201d':'')+' \u2713')},function(m){
+    b.disabled=false;
+    say(m==='NOCHAT'?'Group posting is not available on this Telegram version. Use \u201cPicture via Telegram dialog\u201d or \u201cText + link\u201d.':m)});return}
+  shareCard(q,function(){closeShare();toast('Thanks for sharing \u2713')},function(m){
+   b.disabled=false;
+   say(m.indexOf('Not sent')===0?'Did not send. That group may block bots: use \u201cPost to a group\u201d (needs the bot added once) or \u201cText + link\u201d.':m)});
+ });
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeShare()});
+document.addEventListener('click',function(e){
+ var b=e.target.closest&&e.target.closest('[data-share]');if(!b)return;
+ var el=b.closest('.q'),q=el&&typeof BY!=='undefined'?BY[el.dataset.num]:null;if(!q)return;
+ shareSheet(q);
+});
+
+/* ---- Open the exact question when the app is launched from a shared link ---- */
+function openFromLink(){
+ try{var w=window.Telegram&&Telegram.WebApp,p=w&&w.initDataUnsafe&&w.initDataUnsafe.start_param;
+  if(!/^[QAH]\d+$/i.test(p||''))return;p=p.toUpperCase();
+  var sj=p[0]==='A'?'anat':p[0]==='H'?'histo':'phys',bt=document.querySelector('#subj button[data-subject="'+sj+'"]');
+  if(typeof st!=='undefined'){if(bt&&st.subject!==sj)bt.click();st.t='all';st.j=-1;st.src=null}
+  var s=document.getElementById('search');if(s){s.value=p;s.dispatchEvent(new Event('input',{bubbles:true}))}
+ }catch(e){}
+}
+setTimeout(openFromLink,500);
 
 /* ---- Gate on the Explanation button ---- */
 var _openEx=window.openEx;
@@ -1433,7 +1521,7 @@ function showGate(el,q){
  g.addEventListener('click',function(e){
   var b=e.target.closest('button[data-g]');if(!b)return;e.stopPropagation();
   msg.hidden=true;g.querySelectorAll('button').forEach(function(x){x.disabled=true});
-  if(b.dataset.g==='ad')watchAd(function(){ok(AD_MIN)},bad);else shareCard(q,function(){ok(SHARE_MIN)},bad);
+  if(b.dataset.g==='ad')watchAd(function(){ok(AD_MIN)},bad);else shareGroup(q,function(){ok(SHARE_MIN)},function(m){if(m==='NOCHAT')shareCard(q,function(){ok(SHARE_MIN)},bad);else bad(m)});
  });
  g.scrollIntoView({block:'nearest',behavior:'smooth'});
 }

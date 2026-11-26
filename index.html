@@ -332,6 +332,7 @@ body.nodk .dk{display:none}
 .adgate .row .btn[data-g="share"] em{background:var(--ok-bg)!important;color:var(--ok)!important;font-weight:700!important}
 .adgate .row .btn[data-g="share"]:hover{border-color:var(--ok)}
 .adgate .msg{margin:10px 0 0;font:500 12.5px/1.4 var(--ui)}
+.adgate .ads-st{margin:8px 0 0;font:600 11px var(--ui);letter-spacing:.02em}
 @media(max-width:520px){.adgate .row{flex-direction:column}.adgate .row .btn{flex:1 1 auto;width:100%}}
 .absIdBox{display:grid;gap:5px;padding:9px 10px;margin-top:6px;border:1px solid var(--line);border-radius:11px;background:var(--chip)}
 .absIdBox .lbl{font:600 11px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
@@ -342,6 +343,7 @@ body.nodk .dk{display:none}
 .absStreak .btn{width:auto!important;flex:none;height:30px;padding:0 10px;font-size:12px}
 .absStreak #absScoreWrap{margin-left:auto;font:700 12.5px var(--ui);color:var(--mut);white-space:nowrap}
 #absLbBtn{margin-top:6px}
+.absBuild{margin:8px 2px 0;font:500 10.5px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);opacity:.65}
 .absLb{position:fixed;inset:0;z-index:120;display:grid;place-items:center;background:rgba(6,12,18,.55);padding:16px}
 .absLbCard{width:min(520px,94vw);max-height:82vh;overflow:auto;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:16px}
 .absLbCard h3{margin:0 0 10px;font:700 16px var(--ui)}
@@ -490,7 +492,7 @@ body.nodk .dk{display:none}
 <div class="brand" aria-label="Absalam"><div class="logo" aria-hidden="true"><svg viewBox="0 0 52 52" aria-hidden="true"><defs><linearGradient id="absGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e07b1f"/><stop offset=".52" stop-color="#2f6fd0"/><stop offset="1" stop-color="#8a4fd3"/></linearGradient></defs><rect x="1.5" y="1.5" width="49" height="49" rx="15" fill="url(#absGrad)"/><path d="M10 8 Q26 1 42 8" stroke="#fff" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><text x="26" y="35" text-anchor="middle" font-family="Literata, Georgia, serif" font-size="29" font-weight="700" fill="#fff">A</text><circle cx="19" cy="42.5" r="2.3" fill="#fff" fill-opacity=".95"/><circle cx="26" cy="42.5" r="2.3" fill="#fff" fill-opacity=".95"/><circle cx="33" cy="42.5" r="2.3" fill="#fff" fill-opacity=".95"/></svg></div><div><h1>Absalam<span class="brand-dot">.</span></h1></div><button class="side-x" id="sideX" aria-label="Close menu" title="Close menu (m)">✕</button></div>
 <div class="srcbox"><div class="gh">Subject</div><div class="seg" id="subj"><button data-subject="phys">Physiology</button><button data-subject="anat">Anatomy</button><button data-subject="histo">Histology</button></div></div><div class="srcbox"><div class="gh">Source of questions</div><div class="chips" id="mode" role="group" aria-label="Source of questions"></div></div>
 <nav id="nav" aria-label="Topics and subtopics"></nav>
-<div class="tools"><button class="btn" id="revealAll">Reveal all</button><button class="btn" id="hideAll">Hide all</button><button class="btn" id="dhikrBtn">Show / hide dhikr</button><button class="btn" id="clearBm">Clear bookmarks</button><button class="btn" id="resetBtn">Reset progress</button><div class="resetbox" id="resetBox" hidden><button class="btn" data-r="sec">Reset this section</button><button class="btn" data-r="all">Reset everything</button><button class="btn" data-r="no">Cancel</button></div><div class="ankiExportPack"><button class="btn" id="ankiExportBtn" type="button" title="Choose subjects and chapters, then export to Anki">⇩ Choose &amp; export for Anki (.txt)</button><p class="ankiExportNote" id="ankiExportNote">Choose subjects and chapters before exporting</p></div><div class="ankiExportPack"><button class="btn" id="absPdfBtn" type="button" title="Export only the questions currently shown, as a printable PDF">⇩ Export this group to PDF</button><p class="ankiExportNote" id="absPdfNote">Exports the questions currently shown · 1 ad per export</p><div class="adgate" id="absPdfGate" hidden><div class="hd"><b>🔒 Unlock PDF export</b><i class="free">Ad</i></div><div class="row"><button class="btn pri" data-p="ad"><span>🎬 Watch ad</span><em>unlock 1 export</em></button><button class="btn" data-p="x"><span>Cancel</span><em>later</em></button></div><div class="msg" hidden></div></div></div><button class="btn" id="absLbBtn" type="button">🏆 Leaderboard — top 20</button><button class="btn" id="absStatsBtn" type="button">📊 Crowd stats — hardest questions</button><button class="btn" id="absAnkiBtn" type="button">🧠 Anki — cloze cards</button><button class="btn" id="absVipBtn" type="button">👑 VIP (No Ads)</button><div class="absStreak" id="absStreak" hidden><span id="absStreakTxt">🔥</span><button class="btn" id="absShieldBtn" type="button" hidden>🛡 Restore (ad)</button><span id="absScoreWrap">🏆 <b id="absScoreTxt">0</b></span></div></div>
+<div class="tools"><button class="btn" id="revealAll">Reveal all</button><button class="btn" id="hideAll">Hide all</button><button class="btn" id="dhikrBtn">Show / hide dhikr</button><button class="btn" id="clearBm">Clear bookmarks</button><button class="btn" id="resetBtn">Reset progress</button><div class="resetbox" id="resetBox" hidden><button class="btn" data-r="sec">Reset this section</button><button class="btn" data-r="all">Reset everything</button><button class="btn" data-r="no">Cancel</button></div><div class="ankiExportPack"><button class="btn" id="ankiExportBtn" type="button" title="Choose subjects and chapters, then export to Anki">⇩ Choose &amp; export for Anki (.txt)</button><p class="ankiExportNote" id="ankiExportNote">Choose subjects and chapters before exporting</p></div><div class="ankiExportPack"><button class="btn" id="absPdfBtn" type="button" title="Export only the questions currently shown, as a printable PDF">⇩ Export this group to PDF</button><p class="ankiExportNote" id="absPdfNote">Exports the questions currently shown · 1 ad per export</p><div class="adgate" id="absPdfGate" hidden><div class="hd"><b>🔒 Unlock PDF export</b><i class="free">Ad</i></div><div class="row"><button class="btn pri" data-p="ad"><span>🎬 Watch ad</span><em>unlock 1 export</em></button><button class="btn" data-p="x"><span>Cancel</span><em>later</em></button></div><div class="msg" hidden></div></div></div><button class="btn" id="absLbBtn" type="button">🏆 Leaderboard — top 20</button><button class="btn" id="absStatsBtn" type="button">📊 Crowd stats — hardest questions</button><button class="btn" id="absAnkiBtn" type="button">🧠 Anki — cloze cards</button><button class="btn" id="absVipBtn" type="button">👑 VIP (No Ads)</button><div class="absBuild" id="absBuild">build 26-11 · v7 · <span id="absAdsState" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">ads …</span></div><div class="absStreak" id="absStreak" hidden><span id="absStreakTxt">🔥</span><button class="btn" id="absShieldBtn" type="button" hidden>🛡 Restore (ad)</button><span id="absScoreWrap">🏆 <b id="absScoreTxt">0</b></span></div></div>
 <p class="save">Progress is saved on this device.</p>
 <dl class="keys"><dt><kbd>j</kbd><kbd>k</kbd></dt><dd>Next, previous</dd><dt><kbd>a</kbd>–<kbd>e</kbd></dt><dd>Choose an answer</dd><dt><kbd>r</kbd></dt><dd>Reveal or hide answer</dd><dt><kbd>x</kbd></dt><dd>Show explanation</dd><dt><kbd>b</kbd></dt><dd>Bookmark</dd><dt><kbd>/</kbd></dt><dd>Search</dd><dt><kbd>m</kbd></dt><dd>Show or hide menu</dd></dl>
 </aside>
@@ -571,15 +573,24 @@ const ANATOMY ={"title":"Anatomy","parts":[{"title":"Anterior abdominal wall","g
       try { this._queue = JSON.parse(localStorage.getItem('dig_mcq_pending_answers_v1') || '[]'); } catch (e) { this._queue = []; }
 
       /* prefer the worker: users/ is no longer world-readable once rules v4 is published */
-      const be = window.__absBackend;
+      /* this script runs BEFORE the module that publishes __absBackend, so fall back
+         to the literal URL: reading the global here silently disabled /me, /vip and
+         the offline flush for every session. */
+      const be = window.__absBackend || 'https://absalam-bot.abdomedo2033.workers.dev';
+      window.__absBackend = be;
+      if (!this.initData) { try { window.__absSyncInfo = { reason: 'no_initdata' }; } catch (e) {} }
       if (be && this.initData) {
         try {
           const r = await fetch(be + '/me', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ initData: this.initData }) });
           const j = await r.json();
+          if (!(j && j.ok && j.data)) { try { window.__absSyncInfo = { reason: 'me_' + ((j && j.error) || 'bad'), initData: true }; } catch (e) {} }
           if (j && j.ok && j.data) {
             this.progress = { score: j.data.score || 0, answers: j.data.answers || {}, bookmarks: j.data.bookmarks || {} };
             this._fromWorker = true;
             if (j.data.streak) window.__absRemoteStreak = j.data.streak;
+            if (j.data.srs) window.__absRemoteSrs = j.data.srs;
+            if (j.data.free) window.__absFreeSeen = Object.keys(j.data.free);
+            try{ window.__absSyncInfo={fromWorker:true,answers:Object.keys(this.progress.answers||{}).length,srs:Object.keys(j.data.srs||{}).length,initData:!!this.initData,uid:this.user.id}; }catch(e){}
             localStorage.setItem("absalam_progress_" + this.user.id, JSON.stringify(this.progress));
           }
         } catch (e) {}
@@ -634,7 +645,7 @@ const ANATOMY ={"title":"Anatomy","parts":[{"title":"Anterior abdominal wall","g
     _saveQueue() { try { localStorage.setItem('dig_mcq_pending_answers_v1', JSON.stringify(this._queue.slice(-400))); } catch (e) {} },
     _pushQueue(qid, chosen) { this._queue.push({ q: qid, c: chosen }); this._saveQueue(); },
     async flushAnswers() {
-      const be = window.__absBackend;
+      const be = window.__absBackend || 'https://absalam-bot.abdomedo2033.workers.dev';
       if (!be || !this.initData || !this._queue || !this._queue.length) return;
       for (let i = 0; i < 40 && this._queue.length; i++) {
         const it = this._queue[0];
@@ -656,7 +667,12 @@ const ANATOMY ={"title":"Anatomy","parts":[{"title":"Anterior abdominal wall","g
       localStorage.setItem("absalam_progress_" + this.user.id, JSON.stringify(this.progress));
 
       /* score is owned by the worker; fall back to a direct write if it is not configured */
-      const be = window.__absBackend;
+      const be = window.__absBackend || 'https://absalam-bot.abdomedo2033.workers.dev';
+      if (be && !this.initData) {
+        this._pushQueue(questionId, selectedIndex);
+        if (!window.__absNoInitWarned) { window.__absNoInitWarned = 1;
+          try { toast('\u26a0 Progress is not syncing \u2014 reopen the app from the bot button'); } catch (e) {} }
+      }
       if (be && this.initData) {
         try {
           const r = await fetch(be + '/answer', {
@@ -703,7 +719,7 @@ const ANATOMY ={"title":"Anatomy","parts":[{"title":"Anterior abdominal wall","g
       if (this._pendN >= 5) this.flushStats();
     },
     async flushStats() {
-      if (!rtdb || !this._pendN) return;
+      if (!rtdb || !this._pendN || this._aggBlocked) { this._pendN = 0; this._pend = {}; return; }
       const batch = this._pend; this._pend = {}; this._pendN = 0;
       for (const [num, d] of Object.entries(batch)) {
         try {
@@ -715,7 +731,7 @@ const ANATOMY ={"title":"Anatomy","parts":[{"title":"Anterior abdominal wall","g
             for (const [k, v] of Object.entries(d.o)) cur.o[k] = (cur.o[k] || 0) + v;
             return cur;
           });
-        } catch (e) { console.warn('agg write skipped', num, e); }
+        } catch (e) { this._aggBlocked = true; console.warn('agg writes are worker-only (rules v4) - skipping:', num); break; }
       }
     },
     async saveSrs(map) {
@@ -723,8 +739,15 @@ const ANATOMY ={"title":"Anatomy","parts":[{"title":"Anterior abdominal wall","g
       try { await rtdb.ref('users/' + this.user.id + '/srs').set(map); } catch (e) {}
     },
     async loadSrs() {
-      if (!rtdb || !this.user) return null;
-      try { const snap = await rtdb.ref('users/' + this.user.id + '/srs').once('value'); return snap.val(); } catch (e) { return null; }
+      /* rules v4 closes users/ reads; the worker's /me already carried srs */
+      try {
+        if (rtdb && this.user) {
+          const snap = await rtdb.ref('users/' + this.user.id + '/srs').once('value');
+          const v = snap.val();
+          if (v) return v;
+        }
+      } catch (e) {}
+      return window.__absRemoteSrs || null;
     },
     async getQStats(questionId) {
       if (!rtdb) return null;
@@ -1800,6 +1823,27 @@ var BACKEND='https://absalam-bot.abdomedo2033.workers.dev' /* paste your Cloudfl
 var tg=window.Telegram&&Telegram.WebApp;
 try{if(tg){tg.ready();tg.expand();}}catch(e){}
 
+/* if Telegram gave us no signed session, nothing can sync — say so out loud */
+(function(){
+ function show(){
+  try{
+   if(document.getElementById('absNoTg')) return;
+   var d=document.createElement('div'); d.id='absNoTg';
+   d.textContent='\u26a0 Opened outside Telegram \u2014 your progress cannot sync to your account. Open the app from @'+BOT+' (press Start).';
+   document.body.appendChild(d);
+   var st=document.createElement('style');
+   st.textContent='#absNoTg{position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:#7a2e2e;color:#fff;padding:10px 12px;border-radius:12px;font:600 12.5px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial;box-shadow:0 10px 26px rgba(0,0,0,.3)}';
+   document.head.appendChild(st);
+  }catch(e){}
+ }
+ function check(){
+  var t=window.Telegram&&Telegram.WebApp;
+  if(t&&t.initData){ var d=document.getElementById('absNoTg'); if(d) d.remove(); return; }
+  show();
+ }
+ setTimeout(check,1200); setTimeout(check,4000);
+})();
+
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
 var mem=0; /* in-memory fallback if storage is blocked */
 function passUntil(){return Math.max(mem,+ls(PK)||0)}
@@ -1811,13 +1855,23 @@ var tt;function toast(t){var e=document.getElementById('absToast');if(!e){e=docu
 function watchAd(done,fail){
  if(window.AbsalamDB&&AbsalamDB.isVip){try{done()}catch(e){}return}
  var f=window[ZONE];
- if(typeof f!=='function'){fail('Ads are not available right now.');return}
- var settled=false;
- function yes(){ if(settled)return; settled=true; done(); }
+ if(typeof f!=='function'){
+  var why=(typeof window.__adsDiag==='string')?window.__adsDiag:'ads: not loaded';
+  fail('No ad service ('+why+'). Use Share, or ask for VIP.');
+  return;
+ }
+ var settled=false,t0=Date.now();
+ function yes(){ if(settled)return; settled=true; try{window.__adsLast=Date.now()-t0;}catch(e){} done(); }
  function no(m){ if(settled)return; settled=true; fail(m||'Ad could not be shown. Try again, or share the question instead.'); }
  var p;
- try{ p=f(); }catch(e){ no('Ad could not start. Try again, or share the question instead.'); return; }
- Promise.resolve(p).then(yes,function(){ no('Ad could not be shown. Try again, or share the question instead.'); });
+ try{ p=f(); }catch(e){ var e0='';try{e0=String((e&&(e.message||e))||'').slice(0,120)}catch(_){}
+  try{window.__adsLastErr=e0||'threw with no message'}catch(_){}
+  no('Ad could not start'+(e0?(': '+e0):'')+'. Use Share, or ask for VIP.'); return; }
+ Promise.resolve(p).then(yes,function(e){
+  var why='';try{why=String((e&&(e.message||e.reason||e.error||e))||'').slice(0,120)}catch(_){}
+  try{window.__adsLastErr=why||'no reason given'}catch(_){}
+  no('Ad could not be shown'+(why?(': '+why):'')+'. Try again in a minute, or use Share / VIP.');
+ });
 }
 /* ---- Share a question: picture card + tags; Telegram confirms the message was really sent ---- */
 function cardBlob(q,tags){
@@ -2012,7 +2066,11 @@ function closeGate(el){var g=el.querySelector('.adgate');if(g)g.remove()}
 function showGate(el,q){
  if(el.querySelector('.adgate'))return;
  var g=document.createElement('div');g.className='adgate';
- g.innerHTML='<div class="hd"><b>🔒 Unlock explanations</b><i class="free">Free</i></div><div class="row"><button class="btn pri" data-g="ad"><span>🎬 Watch ad</span><em>'+AD_MIN+' min</em></button><button class="btn" data-g="share"><span>🎁 Share</span><em>up to 3 days</em></button></div><div class="msg" hidden></div>';
+ g.innerHTML='<div class="hd"><b>🔒 Unlock explanations</b><i class="free">Free</i></div><div class="row"><button class="btn pri" data-g="ad"><span>🎬 Watch ad</span><em>'+AD_MIN+' min</em></button><button class="btn" data-g="share"><span>🎁 Share</span><em>up to 3 days</em></button></div><div class="ads-st"></div><div class="msg" hidden></div>';
+ try{ var _st=g.querySelector('.ads-st');
+  _st.textContent='Ad provider: '+(typeof window[ZONE]==='function'?'ready':'BLOCKED by this browser');
+  _st.style.color=(typeof window[ZONE]==='function')?'var(--ok)':'var(--bad)';
+ }catch(e){}
  var anchor=el.querySelector('.expl');anchor.parentNode.insertBefore(g,anchor);
  var msg=g.querySelector('.msg');
  function ok(min){grant(min);closeGate(el);_openEx.call(window,el,q)}
@@ -2033,8 +2091,14 @@ window.openEx=function(el,q){
  if(el.querySelector('.adgate')){closeGate(el);return}
  var num=q&&q.num?String(q.num):'';
  var seen=freeSeen();
+ try{ (window.__absFreeSeen||[]).forEach(function(k){ if(seen.indexOf(k)<0) seen.push(k); }); }catch(e){}
  if(seen.indexOf(num)<0&&seen.length<FREE_N){
   seen.push(num);ls(FREE_K,JSON.stringify(seen));
+  try{ window.__absFreeSeen=(window.__absFreeSeen||[]).concat([num]);
+   var be0=window.__absBackend||'https://absalam-bot.abdomedo2033.workers.dev';
+   if(window.AbsalamDB&&AbsalamDB.initData) fetch(be0+'/free',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({initData:AbsalamDB.initData,spend:num})}).catch(function(){});
+  }catch(e){}
   closeGate(el);
   var left=FREE_N-seen.length;
   toast(left>0?('\uD83C\uDF81 Free explanation '+seen.length+' of '+FREE_N+' \u2014 '+left+' left'):('\uD83C\uDF81 Free explanation '+seen.length+' of '+FREE_N+' \u2014 that was your last free one'));
@@ -2189,7 +2253,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
    var pct=function(v){return tot?Math.round(100*v/tot):0};
    var line=[];
    for(var k=0;k<opts.length;k++){
-    var n=oc[k]||0,pp=pct(n);
+    var n=oc['o'+k]!=null?oc['o'+k]:(oc[k]||0),pp=pct(n);
     line.push(L[k]+' '+pp+'%');
     rows+='<div style="display:flex;align-items:center;gap:8px;margin-top:5px"><b style="width:14px">'+L[k]+'</b>'+
           '<div class="bar" style="flex:1"><i style="width:'+pp+'%"></i></div>'+
@@ -2227,7 +2291,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
    arr.slice(0,20).forEach(function(x,i){
     var q=BY[x.n]||{},pc=Math.round(100*x.p),L='ABCDEFGHIJ';
     var worst='',wn=0;
-    Object.keys(x.o).forEach(function(k){if(x.o[k]>wn){wn=x.o[k];worst=k}});
+    Object.keys(x.o).forEach(function(k){var v=x.o[k];if(v>wn){wn=v;worst=String(k).replace(/^o/,'')}});
     var trap=(worst!==''&&+worst!==q.answer)?(' · most-picked '+L[+worst]+' ('+Math.round(100*wn/x.t)+'%)'):'';
     h+='<div class="absStRow"><div class="t">'+(i+1)+'. '+esc((q.stem||x.n).slice(0,120))+'</div>'+
        '<div class="m"><span class="p">'+pc+'% correct</span><span>'+x.t+' attempts</span><span>'+esc(x.n)+'</span>'+trap+'</div></div>';
@@ -2460,6 +2524,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
 <script id="absExtras2Js">
 (function(){
  'use strict';
+ try{ console.log('Absalam build 26-11 v7'); }catch(e){}
  var toast=function(t){ if(window.__absToast) return window.__absToast(t); console.log(t); };
  var grant=function(m){ if(window.__absGrant) return window.__absGrant(m);
    try{ localStorage.setItem('dig_mcq_pass_v1', String(Date.now()+m*60000)); }catch(e){} };
@@ -2494,6 +2559,73 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
    if(ev.target.classList.contains('absLb')||ev.target.closest('.absLbClose')) w.remove();
   });
  });
+
+ (function(){
+  var tries=0;
+  function paint(t){ try{ window.__adsDiag=t; var e=document.getElementById('absAdsState'); if(e) e.textContent=t; console.log('Absalam ads:',t); }catch(x){} }
+  function inject(cb){
+   try{
+    /* drop any previous tag first: two live SDK copies can fight each other */
+    var old=document.querySelector('script[src*="libtl"]');
+    if(old&&old.parentNode) old.parentNode.removeChild(old);
+    var sc=document.createElement('script');
+    sc.src='https://libtl.com/sdk.js?r='+Date.now();
+    sc.setAttribute('data-zone','12344340'); sc.setAttribute('data-sdk',ZONE);
+    sc.onload=function(){ setTimeout(cb,500); };
+    sc.onerror=function(){ setTimeout(cb,500); };
+    document.head.appendChild(sc);
+   }catch(e){ setTimeout(cb,500); }
+  }
+  function tick(){
+   if(typeof window[ZONE]==='function'){ window.__adsLoaded=true; window.__adsTries=tries; paint('ads ready'); return; }
+   if(tries>=1){ window.__adsLoaded=false; window.__adsTries=tries;
+    paint((navigator.onLine===false)?'ads: offline':'ads: blocked'); return; }
+   tries++; paint('ads: retry '+tries); inject(tick);
+  }
+  setTimeout(tick,3500);
+
+  /* tap the 'ads …' text in the sidebar for a readable report (no console on a phone) */
+  document.addEventListener('click',function(e){
+   if(!e.target.closest('#absAdsState')) return;
+   var lines=[
+    'SDK '+ZONE+': '+(typeof window[ZONE]==='function'?'LOADED':'MISSING'),
+    'zone id: 12344340',
+    'script tag in page: '+(document.querySelector('script[data-zone],script[src*="libtl"]')?'yes':'no'),
+    'device online: '+(navigator.onLine===false?'NO':'yes'),
+    're-fetch attempts: '+String(window.__adsTries==null?'-':window.__adsTries),
+    'last ad duration: '+(window.__adsLast?window.__adsLast+' ms':'never shown'),
+    'last refusal: '+(window.__adsLastErr||'none yet'),
+    'Telegram context: '+(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData?'yes':'no'),
+    'account id: '+String((window.AbsalamDB&&AbsalamDB.user&&AbsalamDB.user.id)||'-')+(String((window.AbsalamDB&&AbsalamDB.user&&AbsalamDB.user.id)||'').indexOf('guest_')===0?'  (GUEST - not syncing)':''),
+    'sync: '+String((window.__absSyncInfo&&window.__absSyncInfo.reason)||'not attempted'),
+    'cloud answers: '+String((window.__absSyncInfo&&window.__absSyncInfo.answers)||0),
+    'free explanations left (server): '+String((window.__absFreeSeen||[]).length?Math.max(0,2-(window.__absFreeSeen||[]).length):2),
+    'cloud SRS cards: '+String((window.__absSyncInfo&&window.__absSyncInfo.srs)||0)
+   ];
+   var w=document.createElement('div');w.className='absLb';
+   w.innerHTML='<div class="absLbCard"><h3>\ud83d\udd0d Ad check</h3>'+
+    lines.map(function(x){return '<p class="absLbNote" style="margin:4px 0;word-break:break-word">'+x+'</p>'}).join('')+
+    '<button class="btn pri" type="button" id="absAdLive" style="width:100%">Show me a test ad now</button>'+
+    '<button class="btn" type="button" id="absAdClose" style="width:100%;margin-top:8px">Close</button></div>';
+   w.onclick=function(ev){ if(ev.target===w||ev.target.id==='absAdClose') w.remove(); };
+   document.body.appendChild(w);
+   var live=document.getElementById('absAdLive');
+   if(live) live.onclick=function(){
+    live.disabled=true; live.textContent='Requesting an ad\u2026';
+    var t0=Date.now();
+    function res(t){ live.disabled=false; live.textContent='Show me a test ad now';
+     try{window.__adsLastErr=t}catch(_){}}
+    try{
+     if(typeof window[ZONE]!=='function'){ res('SDK not loaded — nothing to call'); return; }
+     var pr=window[ZONE]();
+     Promise.resolve(pr).then(function(){ try{window.__adsLast=Date.now()-t0}catch(_){}
+       res('ad shown'); },function(err){
+       var m='';try{m=String((err&&(err.message||err.reason||err.error||err))||'')}catch(_){}
+       try{window.__adsLast=Date.now()-t0}catch(_){}
+       res(m||'refused with no message'); });
+    }catch(err){ var m='';try{m=String((err&&(err.message||err))||'')}catch(_){} res(m||'threw'); }
+   };
+  });
 
  /* ---------- B. streak ---------- */
  var SK='dig_mcq_streak_v1';

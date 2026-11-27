@@ -2733,7 +2733,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
   function paint(t){ try{ window.__adsDiag=t; var e=document.getElementById('absAdsState'); if(e) e.textContent=t; console.log('Absalam ads:',t); }catch(x){} }
   /* try a same-origin copy first: Telegram Desktop blocks libtl.com, and the
      Monetag docs show the tag as https://yourdomain.com/sdk.js (self-hostable) */
-  var SRCS=['sdk.js', 'https://libtl.com/sdk.js?r='+Date.now()];
+  var SRCS=['sdk.js?v=2026-11-27', 'https://libtl.com/sdk.js?r='+Date.now()];
   var srcI=0;
   function inject(cb){
    try{

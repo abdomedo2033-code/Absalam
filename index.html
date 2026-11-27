@@ -7,6 +7,7 @@
 <script src="https://libtl.com/sdk.js" data-zone="12344340" data-sdk="show_12344340"></script>
 
 <meta charset="utf-8">
+<script>window.__absT0=performance.now();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Absalam DIG 206 MCQ Bank — Physiology, Anatomy & Histology practice questions with verified Department Book answers">
@@ -1363,7 +1364,7 @@ const card=(q,n)=>`<article class="q ${CL[q.topic]}" id="${q.num}" data-num="${q
 <div class="bd"><div class="sb"><span class="tags">${tagsOf(q).map(([v,k])=>`<span class="tg ${k}">${v}</span>`).join('')}</span></div><p class="stem">${hl(q.stem)}</p>
 ${q.image?`<img class="qimage" src="${q.image}" alt="${esc(q.image_alt||'Question figure')}">`:''}
 <ol class="opts">${q.options.map((o,i)=>`<li class="opt" data-i="${i}" tabindex="0" role="button"><b>${L(i)}</b><span>${hl(o)}</span><em class="tk"></em></li>`).join('')}</ol>
-<div class="acts"><button class="btn pri" data-a="ans">${q.answer===-1?'Unkeyed — review':'Reveal'}</button><button class="btn" data-a="exp">Explanation</button><i class="brk"></i><button class="chk" data-a="bm" aria-pressed="false">☆ Bookmark</button><button class="btn" data-share="1" title="Send this question to a group">📤 Share</button><button class="btn" data-a="rep">Report</button></div>
+<div class="acts"><button class="btn pri" data-a="ans">${q.answer===-1?'Unkeyed — review':'Reveal'}</button><button class="btn" data-a="exp">Explanation</button><i class="brk"></i><button class="chk" data-a="bm" aria-pressed="false">☆ Bookmark</button><button class="btn" data-share="1" title="Share this question">📤 Share</button><button class="btn" data-a="rep">Report</button></div>
 <div class="expl"></div></div></article>`;
 const tagOf=(num,own)=>{const z=ALL.find(o=>o.num===num)||{};const src=(own&&own.length?own:z.sources)||[];const ys=yearsOf({sources:src,histo:z.histo,anat:z.anat,num:'__tag'});const isDep=x=>!/^DIG 206 Dept Book p\./.test(x)&&/\bDEP\b|Dept\.? Book|\bDepartment\b/i.test(x);const dep=src.some(isDep);let dy='';for(const x of src){const m=x.match(/Department\s+(20\d{2})/i);if(m){dy=' '+m[1];break}}const parts=[];if(ys.length)parts.push('Exam '+ys.join(' · '));if(dep)parts.push('DEP'+dy);if(!parts.length){const o=src.filter(x=>!/Dept Book p\./.test(x)).map(x=>x.replace(/\s*Q\d+\s*$/,'')).slice(0,2);parts.push(o.length?o.join(' · '):'Year not recorded')}return parts.join(' + ')};
 const mergedFormDetails=q=>{
@@ -1897,14 +1898,21 @@ function watchAd(done,fail){
  try{ p=f(); }catch(e){ var e0='';try{e0=String((e&&(e.message||e))||'').slice(0,120)}catch(_){}
   try{window.__adsLastErr=e0||'threw with no message'}catch(_){}
   no('Ad could not start'+(e0?(': '+e0):'')+'. Use Share, or ask for VIP.'); return; }
- Promise.resolve(p).then(yes,function(e){
+ Promise.resolve(p).then(function(res){
+  /* Monetag resolves on ANY close, including an early one. Only 'valued' pays. */
+  var rt=res&&(res.reward_event_type||res.rewardEventType);
+  if(rt===undefined){ yes(); return; }              /* older SDK: fall back to the timer check */
+  if(rt==='valued'){ yes(); return; }
+  try{ window.__adsLastErr='closed early ('+rt+')'; }catch(e){}
+  no('You closed the ad early \u2014 no reward this time. Watch it to the end, or use Share.');
+ },function(e){
   var why='';try{why=String((e&&(e.message||e.reason||e.error||e))||'').slice(0,120)}catch(_){}
   try{window.__adsLastErr=why||'no reason given'}catch(_){}
   no('Ad could not be shown'+(why?(': '+why):'')+'. Try again in a minute, or use Share / VIP.');
  });
 }
 /* ---- Share a question: picture card + tags; Telegram confirms the message was really sent ---- */
-function cardBlob(q,tags){
+function cardBlob(q,tags,code){
  return new Promise(function(res){
   var W=1080,M=60,cv=document.createElement('canvas'),c=cv.getContext('2d');
   var UI='"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif',SER='Literata,Georgia,"Times New Roman",serif';
@@ -1920,7 +1928,7 @@ function cardBlob(q,tags){
     c.fillStyle='rgba(255,255,255,.07)';c.beginPath();c.arc(W-70,20,150,0,7);c.fill();c.beginPath();c.arc(W-230,190,90,0,7);c.fill();
     var lg=c.createLinearGradient(M,50,M+90,140);lg.addColorStop(0,'#e07b1f');lg.addColorStop(.52,'#2f6fd0');lg.addColorStop(1,'#8a4fd3');c.fillStyle=lg;rr(M,50,90,90,26);c.fill();
     c.fillStyle='#fff';c.font='800 56px '+UI;c.textAlign='center';c.fillText('A',M+45,115);c.textAlign='left';
-    c.font='800 44px '+UI;c.fillText('Absalam',M+116,92);c.font='500 26px '+UI;c.fillStyle='rgba(255,255,255,.82)';c.fillText('DIG 206'+(subj?' · '+subj:'')+' · MCQ Bank',M+116,128);
+    c.font='800 44px '+UI;c.fillText('Absalam',M+116,92);c.font='500 26px '+UI;c.fillStyle='rgba(255,255,255,.82)';c.fillText('DIG 206'+(subj?' · '+subj:'')+' · @'+BOT,M+116,128);
     var id=String(q.num||'');c.font='700 28px '+UI;var iw=c.measureText(id).width+44;c.fillStyle='rgba(255,255,255,.18)';rr(W-M-iw,68,iw,52,26);c.fill();c.fillStyle='#fff';c.fillText(id,W-M-iw+22,104)}
    y+=38;
    if(tags.length){var x=M;c.font='700 24px '+UI;tags.slice(0,7).forEach(function(t){var lab=String(t[0]),col=TC[t[1]]||['#0b6465','#dff1f0'],w=c.measureText(lab).width+34;if(x+w>W-M)return;if(d){c.fillStyle=col[1];rr(x,y,w,48,24);c.fill();c.fillStyle=col[0];c.fillText(lab,x+17,y+32)}x+=w+12});y+=48+34}
@@ -1936,7 +1944,7 @@ function cardBlob(q,tags){
    if(d){var fg=c.createLinearGradient(M,y,W-M,y+196);fg.addColorStop(0,'#0f1d2b');fg.addColorStop(1,'#0e3a40');c.fillStyle=fg;rr(M,y,W-2*M,196,32);c.fill();
     c.fillStyle='#7fd6d0';c.font='700 26px '+UI;c.fillText('THINK YOU KNOW IT?',M+44,y+58);
     c.fillStyle='#fff';c.font='800 44px '+UI;c.fillText('Solve it in @'+BOT,M+44,y+118);
-    c.fillStyle='#8fa3ad';c.font='500 24px '+UI;c.fillText('Answer + explanation inside',M+44,y+160)}
+    c.fillStyle='#8fa3ad';c.font='500 24px '+UI;c.fillText(code?('Send /start '+code+' to this bot'):'Answer + explanation inside',M+44,y+160)}
    return y+196+M;
   }
   var H=900;
@@ -1959,7 +1967,7 @@ function cardBlob(q,tags){
  });
 }
 function blobB64(b){return new Promise(function(res){if(!b)return res(null);var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]||null)};r.onerror=function(){res(null)};r.readAsDataURL(b)})}
-/* ---- Share = normal Telegram message (text + link). Confirmed when a groupmate opens the link inside a group ---- */
+/* ---- Share = message + link; confirmed when a DIFFERENT Telegram account opens it (any chat, DM included) ---- */
 var APPLINK='https://t.me/'+BOT+'?startapp=',PEND_K='dig_mcq_pending_shares_v1',waiters={},pt=null;
 function pend(){try{return JSON.parse(ls(PEND_K)||'[]')}catch(e){return[]}}
 function setPend(a){ls(PEND_K,JSON.stringify(a.slice(-10)))}
@@ -1979,8 +1987,10 @@ function startShare(q,gate,cb){
  if(!tg||!tg.initData){try{if(window.__absShareFallback)window.__absShareFallback(q)}catch(e){}cb('err','Sharing works inside the Telegram app only \u2014 the card is on screen, long-press to save it.');return}
  if(!BACKEND){cb('err','Sharing is not set up yet. Use the ad option instead.');return}
  var tags=[];try{if(typeof tagsOf==='function')tags=tagsOf(q)}catch(e){}
- var tokP=api('/share/create',{initData:tg.initData,q:{num:q.num}}),imgP=cardBlob(q,tags).then(blobB64,function(){return null});
- Promise.all([tokP,imgP]).then(function(r){var j=r[0],img=r[1];
+ var tokP=api('/share/create',{initData:tg.initData,q:{num:q.num}});
+ tokP.then(function(jj){
+  return cardBlob(q,tags,jj&&jj.code).then(blobB64,function(){return null}).then(function(img){ return [jj,img]; });
+ }).then(function(r){var j=r[0],img=r[1];
   if(!j||!j.token)throw new Error(j&&j.error||'x');
   var token=j.token,link=APPLINK+token;
   function track(){var p=pend();p.push({t:token,n:q.num,g:gate?1:0,ts:Date.now(),lvl:0});setPend(p);waiters[token]=cb;poll()}
@@ -1988,12 +1998,12 @@ function startShare(q,gate,cb){
    if(s&&s.ok){track();
     if(s.photo===false){ try{toast('\u26a0 Card sent WITHOUT the image \u2014 the picture could not be attached')}catch(e){} }
     try{tg.openTelegramLink('https://t.me/'+BOT)}catch(e){}
-    cb('wait','Card sent to your chat with @'+BOT+'. Forward it to your group \u2014 it unlocks when a classmate taps it.');return}
+    cb('wait','Card sent to your chat with @'+BOT+(j.code?(' \u00b7 code '+j.code):'')+'. Forward it \u2014 or post the picture in a group: classmates type /start '+(j.code||'CODE')+' in @'+BOT+'.');return}
    if(s&&s.error==='start_bot'){cb('err','Open @'+BOT+', press Start, then tap Share again.');try{tg.openTelegramLink('https://t.me/'+BOT+'?start=share')}catch(e){}return}
    /* fallback: normal link message (some groups delete links) */
    track();var url='https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(shareText(q));
    try{tg.openTelegramLink(url)}catch(e){location.href=url}
-   cb('wait','Choose a group and send it. It is confirmed as soon as a groupmate opens the link.');
+   cb('wait','Pick any chat and send it. It counts as soon as a different account opens the link.');
   });
  }).catch(function(e){try{if(window.__absShareFallback&&String(e&&e.message)!=='rate')window.__absShareFallback(q)}catch(_e){}
   cb('err',(function(m){return m==='rate'?'Too many shares this hour. Try again later or use the ad option.':'Share failed: '+m+' \u2014 use the ad option meanwhile.'})(String(e&&e.message||e)))});
@@ -2079,7 +2089,7 @@ function gotoQ(num){
  try{sp=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param)||''}catch(e){}
  if(!sp){try{sp=new URLSearchParams(location.hash.slice(1)).get('tgWebAppStartParam')||new URLSearchParams(location.search).get('tgWebAppStartParam')||''}catch(e){}}
  if(!/^s_[A-Za-z0-9]{8,16}$/.test(sp)||!tg||!tg.initData||!BACKEND)return;
- (function claim(n){api('/share/claim',{initData:tg.initData,sp:sp}).then(function(j){if(j&&j.q){setTimeout(function(){gotoQ(j.q)},700);var m={true:'\u2713 Counted: opened from a group. Your classmate gets credit.'}[j.confirmed]||(j.reason==='self'?'':j.reason==='not_group'?'Opened outside a group (Telegram reported: '+j.ct+'), so it was not counted.':j.reason==='same_group_recently'?'Already counted for this group recently.':'');if(m){setTimeout(function(){toast(m)},1500)}}else if(n>1){setTimeout(function(){claim(n-1)},2000)}}).catch(function(){if(n>1){setTimeout(function(){claim(n-1)},2000)}else{try{localStorage.setItem('dig_mcq_pending_claim_v1',sp)}catch(e){}}});})(3);
+ (function claim(n){api('/share/claim',{initData:tg.initData,sp:sp}).then(function(j){if(j&&j.q){setTimeout(function(){gotoQ(j.q)},700);var m={true:'\u2713 Counted — a classmate opened your link.'}[j.confirmed]||(j.reason==='self'?'':j.reason==='not_group'?'Opened, but it was not counted. Try again from the link.':j.reason==='same_group_recently'?'Already counted for this person.':'');if(m){setTimeout(function(){toast(m)},1500)}}else if(n>1){setTimeout(function(){claim(n-1)},2000)}}).catch(function(){if(n>1){setTimeout(function(){claim(n-1)},2000)}else{try{localStorage.setItem('dig_mcq_pending_claim_v1',sp)}catch(e){}}});})(3);
 })();
 
 /* ---- retry a share claim that never reached the worker ---- */
@@ -2100,7 +2110,7 @@ document.addEventListener('click',function(e){
  var b=e.target.closest&&e.target.closest('[data-share]');if(!b)return;
  var el=b.closest('.q'),q=el&&typeof BY!=='undefined'?BY[el.dataset.num]:null;if(!q)return;
  if(b.disabled)return;b.disabled=true;
- startShare(q,false,function(s,m){if(s==='wait'){b.disabled=false;toast('Forward the card from your bot chat to a group. You get a \u2713 when a groupmate taps it.')}else if(s==='ok')toast('\u2713 Posted in a group \u2014 thank you for sharing!');else{b.disabled=false;toast(m)}});
+ startShare(q,false,function(s,m){if(s==='wait'){b.disabled=false;toast('The card is in your chat with the bot — forward it to a classmate or a group. You get a \u2713 when someone opens it.')}else if(s==='ok')toast('\u2713 Shared \u2014 thank you!');else{b.disabled=false;toast(m)}});
 });
 
 /* ---- Gate on the Explanation button ---- */
@@ -2109,7 +2119,7 @@ function closeGate(el){var g=el.querySelector('.adgate');if(g)g.remove()}
 function showGate(el,q){
  if(el.querySelector('.adgate'))return;
  var g=document.createElement('div');g.className='adgate';
- g.innerHTML='<div class="hd"><b>🔒 Unlock explanations</b><i class="free">Free</i></div><div class="row"><button class="btn pri" data-g="ad"><span>🎬 Watch ad</span><em>'+AD_MIN+' min</em></button><button class="btn" data-g="share"><span>🎁 Share</span><em>up to 3 days</em></button></div><div class="ads-st"></div><div class="msg" hidden></div>';
+ g.innerHTML='<div class="hd"><b>🔒 Unlock explanations</b><i class="free">Free</i></div><div class="row"><button class="btn pri" data-g="ad"><span>🎬 Watch ad</span><em>'+AD_MIN+' min</em></button><button class="btn" data-g="share"><span>🎁 Share</span><em>up to 3 days</em></button><button class="btn" data-g="x"><span>Cancel</span><em>later</em></button></div><div class="ads-st"></div><div class="msg" hidden></div>';
  try{ var _st=g.querySelector('.ads-st');
   _st.textContent='Ad provider: '+(typeof window[ZONE]==='function'?'ready':'BLOCKED by this browser');
   _st.style.color=(typeof window[ZONE]==='function')?'var(--ok)':'var(--bad)';
@@ -2121,7 +2131,9 @@ function showGate(el,q){
  g.addEventListener('click',function(e){
   var b=e.target.closest('button[data-g]');if(!b)return;e.stopPropagation();
   msg.hidden=true;msg.style.color='';g.querySelectorAll('button').forEach(function(x){x.disabled=true});
-  if(b.dataset.g==='ad')watchAd(function(){ok(AD_MIN)},bad);else startShare(q,true,function(s,m){if(s==='ok')ok(m||SHARE_MIN);else if(s==='wait'){msg.textContent=m;msg.style.color='var(--mut)';msg.hidden=false;g.querySelectorAll('button').forEach(function(x){x.disabled=false})}else bad(m)});
+  if(b.dataset.g==='ad')watchAd(function(){ok(AD_MIN)},bad);
+  else if(b.dataset.g==='x'){ closeGate(el); }
+  else startShare(q,true,function(s,m){if(s==='ok')ok(m||SHARE_MIN);else if(s==='wait'){msg.textContent=m;msg.style.color='var(--mut)';msg.hidden=false;g.querySelectorAll('button').forEach(function(x){x.disabled=false})}else bad(m)});
  });
  g.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
@@ -2145,13 +2157,13 @@ window.openEx=function(el,q){
   }catch(e){}
   closeGate(el);
   var left=FREE_N-seen.length;
-  toast(left>0?('\uD83C\uDF81 Free explanation '+seen.length+' of '+FREE_N+' \u2014 '+left+' left'):('\uD83C\uDF81 Free explanation '+seen.length+' of '+FREE_N+' \u2014 that was your last free one'));
+  toast(left>0?('\ud83c\udf81 Free explanation '+seen.length+' of '+FREE_N+' \u2014 '+left+' left'):('\ud83c\udf81 Free explanation '+seen.length+' of '+FREE_N+' \u2014 that was your last free one'));
   return _openEx.apply(this,arguments);
  }
  showGate(el,q);
 };
 
-window.__absWatchAd=watchAd;window.__absToast=toast;window.__absGrant=grant;window.__absPassOn=passOn;window.__absBackend=BACKEND;window.__absZone=ZONE;
+window.__absWatchAd=watchAd;window.__absToast=toast;window.__absGrant=grant;window.__absPassOn=passOn;window.__absBackend=BACKEND;window.__absStartShare=startShare;window.__absZone=ZONE;
 /* ---- In-app interstitial: one per INAPP_EVERY newly answered questions, never mid-question ---- */
 var counted={},n=0,_grade=window.grade;
 if(typeof _grade==='function')window.grade=function(el,q){
@@ -2410,15 +2422,31 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
  }
  function loadJsPDF(cb){
   if(window.jspdf&&window.jspdf.jsPDF)return cb(window.jspdf.jsPDF);
-  var sc=document.createElement('script');
-  sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-  sc.onload=function(){cb(window.jspdf&&window.jspdf.jsPDF||null)};
-  sc.onerror=function(){cb(null)};
-  document.head.appendChild(sc);
+  var urls=[
+   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+   'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
+   'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js'
+  ];
+  var i=0;
+  function next(){
+   if(i>=urls.length){ window.__pdfErr='engine'; cb(null); return; }
+   var url=urls[i++], settled=false;
+   var sc=document.createElement('script');
+   var to=setTimeout(function(){ if(settled)return; settled=true; next(); }, 9000);
+   sc.src=url;
+   sc.onload=function(){
+    if(settled)return; settled=true; clearTimeout(to);
+    if(window.jspdf&&window.jspdf.jsPDF){ window.__pdfErr=''; cb(window.jspdf.jsPDF); }
+    else next();
+   };
+   sc.onerror=function(){ if(settled)return; settled=true; clearTimeout(to); next(); };
+   document.head.appendChild(sc);
+  }
+  next();
  }
  function makePdf(list,label,done){
   loadJsPDF(function(J){
-   if(!J){done(false);return;}
+   if(!J){ window.__pdfErr='engine'; done(false,'engine'); return; }
    try{
     var doc=new J({unit:'mm',format:'a4'});
     var M=14,W=210-M*2,L='ABCDEFGHIJ';
@@ -2562,7 +2590,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
         .then(function(j){
          if(j&&j.ok) toast('\ud83d\udcc4 PDF sent to your Telegram chat');
          else if(j&&j.error==='too_big') toast('Too many questions for one PDF \u2014 pick a smaller group');
-         else toast('Could not send the PDF \u2014 downloading instead'),saveFile();
+         else toast('Could not send the PDF ('+((j&&j.error)||'network')+')');
         })
         .catch(function(){ saveFile(); });
       };
@@ -2586,7 +2614,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
      var a=w.querySelector('a'); if(a) a.click();
     }
     done(true);
-   }catch(e){console.warn('pdf failed',e);done(false);}
+   }catch(e){ window.__pdfErr='draw: '+((e&&e.message)||e); console.warn('pdf failed',e); done(false, window.__pdfErr); }
   });
  }
  window.__absMakePdf=function(l,lab,cb){ return makePdf(l,lab,cb); };
@@ -2703,13 +2731,16 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
   var ZONE=window.__absZone||'show_12344340';
   var tries=0;
   function paint(t){ try{ window.__adsDiag=t; var e=document.getElementById('absAdsState'); if(e) e.textContent=t; console.log('Absalam ads:',t); }catch(x){} }
+  /* try a same-origin copy first: Telegram Desktop blocks libtl.com, and the
+     Monetag docs show the tag as https://yourdomain.com/sdk.js (self-hostable) */
+  var SRCS=['sdk.js', 'https://libtl.com/sdk.js?r='+Date.now()];
+  var srcI=0;
   function inject(cb){
    try{
-    /* drop any previous tag first: two live SDK copies can fight each other */
-    var old=document.querySelector('script[src*="libtl"]');
+    var old=document.querySelector('script[src*="libtl"],script[src^="sdk.js"],script[src$="/sdk.js"]');
     if(old&&old.parentNode) old.parentNode.removeChild(old);
     var sc=document.createElement('script');
-    sc.src='https://libtl.com/sdk.js?r='+Date.now();
+    sc.src=SRCS[Math.min(srcI++,SRCS.length-1)];
     sc.setAttribute('data-zone','12344340'); sc.setAttribute('data-sdk',ZONE);
     sc.onload=function(){ setTimeout(cb,500); };
     sc.onerror=function(){ setTimeout(cb,500); };
@@ -2718,7 +2749,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
   }
   function tick(){
    if(typeof window[ZONE]==='function'){ window.__adsLoaded=true; window.__adsTries=tries; paint('ads ready'); return; }
-   if(tries>=1){ window.__adsLoaded=false; window.__adsTries=tries;
+   if(tries>=2){ window.__adsLoaded=false; window.__adsTries=tries;
     paint((navigator.onLine===false)?'ads: offline':'ads: blocked'); return; }
    tries++; paint('ads: retry '+tries); inject(tick);
   }
@@ -2737,9 +2768,10 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
     'last refusal: '+(window.__adsLastErr||'none yet'),
     'Telegram context: '+(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData?'yes':'no'),
     'account id: '+String((window.AbsalamDB&&AbsalamDB.user&&AbsalamDB.user.id)||'-')+(String((window.AbsalamDB&&AbsalamDB.user&&AbsalamDB.user.id)||'').indexOf('guest_')===0?'  (GUEST - not syncing)':''),
-    'sync: '+String((window.__absSyncInfo&&window.__absSyncInfo.reason)||'not attempted'),
+    'sync: '+(window.__absSyncInfo ? (window.__absSyncInfo.reason?String(window.__absSyncInfo.reason):'ok') : 'not attempted'),
     'cloud answers: '+String((window.__absSyncInfo&&window.__absSyncInfo.answers)||0),
     'free explanations left (server): '+String((window.__absFreeSeen||[]).length?Math.max(0,2-(window.__absFreeSeen||[]).length):2),
+    'last PDF error: '+String(window.__pdfErr||'none'),
     'cloud SRS cards: '+String((window.__absSyncInfo&&window.__absSyncInfo.srs)||0)
    ];
    var w=document.createElement('div');w.className='absLb';
@@ -3394,12 +3426,14 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
   var n=picked().length;
   h+='<p class="pf-count">'+(CH&&SG?(n+' question'+(n===1?'':'s')+' selected'):'Choose a chapter and a group to continue')+'</p>';
   h+='<button class="btn pri pf-go" id="pfGo" type="button"'+((n&&CH&&SG)?'':' disabled')+'>Export this group</button>';
+  var adsOk=false; try{ adsOk=typeof window[(window.__absZone||'show_12344340')]==='function'; }catch(e){}
   h+='<div class="pf-gate" id="pfGate" hidden>'+
-     '<div class="pf-gate-hd">\ud83c\udfac Watch one short ad to export <b id="pfGateN">'+n+'</b> question'+(n===1?'':'s')+'</div>'+
+     '<div class="pf-gate-hd">\ud83d\udd13 Unlock this export \u2014 <b id="pfGateN">'+n+'</b> question'+(n===1?'':'s')+'</div>'+
      '<div class="pf-gate-row">'+
-     '<button class="btn pri" id="pfAd" type="button">Watch ad</button>'+
+     '<button class="btn pri" id="pfAd" type="button"'+(adsOk?'':' disabled')+'>'+(adsOk?'\ud83c\udfac Watch ad':'\ud83c\udfac Ad unavailable here')+'</button>'+
+     '<button class="btn" id="pfShare" type="button">\ud83c\udf81 Share instead</button>'+
      '<button class="btn" id="pfCancel" type="button">Cancel</button></div>'+
-     '<div class="pf-msg" id="pfMsg" hidden></div></div>';
+     '<div class="pf-msg" id="pfMsg" hidden>'+(adsOk?'':'Ads cannot load in this client \u2014 share a question to unlock the export.')+'</div></div>';
   h+='<p class="pf-note" id="pfNote">Exports <b>one</b> group at a time \u2014 pick the chapter, then the group. Cancelled and disputed items are left out by default. VIP skips the ad.</p>';
   shell(h);
   var w=document.getElementById('absPdfPickWrap');
@@ -3422,6 +3456,19 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
     var g=w.querySelector('#pfGate'), go=w.querySelector('#pfGo'), nt=w.querySelector('#pfNote');
     w.querySelector('#pfGateN').textContent=list.length;
     if(g) g.hidden=false; if(go) go.hidden=true; if(nt) nt.hidden=true;
+    return;
+   }
+   if(e.target.id==='pfShare'){
+    var l2=picked(); if(!l2.length) return;
+    var m2=w.querySelector('#pfMsg');
+    if(m2){ m2.hidden=false; m2.textContent='Sending the card to your chat\u2026'; }
+    var f2=window.__absStartShare;
+    if(!f2){ if(m2) m2.textContent='Sharing is not available right now.'; return; }
+    f2(l2[0],true,function(st,mm){
+     if(st==='ok'){ w.remove(); run(l2,label()); }
+     else if(st==='wait'){ if(m2) m2.textContent=mm||'Forward the card in a group or DM, then come back and export.'; }
+     else { if(m2) m2.textContent=mm||'Could not share \u2014 try the ad or VIP.'; }
+    });
     return;
    }
    if(e.target.id==='pfCancel'){
@@ -3448,7 +3495,13 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
  }
  function run(list,lab){
   if(!window.__absMakePdf){ toast('PDF engine not ready'); return; }
-  window.__absMakePdf(list,lab,function(ok){ if(!ok) toast('PDF failed \u2014 try again'); });
+  window.__absMakePdf(list,lab,function(ok,why){
+   if(ok) return;
+   var w=String(why||'');
+   if(w==='engine') toast('PDF engine could not load \u2014 check your connection, then retry');
+   else if(w.indexOf('draw:')===0) toast('PDF error: '+w.slice(5).slice(0,70));
+   else toast('PDF failed ('+(w||'unknown')+')');
+  });
  }
  document.addEventListener('click',function(e){ if(e.target.closest('#absPdfPick')) draw(); });
 })();
@@ -3588,6 +3641,15 @@ body.absFs #absToast{bottom:calc(26px + var(--abs-safe-bottom))!important}
   try{
    document.documentElement.style.setProperty('--abs-safe-top',top+'px');
    document.documentElement.style.setProperty('--abs-safe-bottom',bot+'px');
+  }catch(e){}
+  try{
+   var bl=document.getElementById('absBuild');
+   if(bl && window.__absT0 && !document.getElementById('absBoot')){
+    var bk=Math.round(performance.now()-window.__absT0);
+    var sp=document.createElement('span'); sp.id='absBoot';
+    sp.textContent=' \u00b7 \u23f1 '+(bk/1000).toFixed(1)+'s';
+    bl.appendChild(sp);
+   }
   }catch(e){}
   var b=document.getElementById('absFsBtn');
   if(b) b.innerHTML='<span>'+(fs?'\u26f6 Exit fullscreen':'\u26f6 Fullscreen')+'</span>';

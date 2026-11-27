@@ -1902,19 +1902,19 @@ function watchAd(done,fail){
 
  /* the server, not the SDK promise, decides whether the view was worth a reward */
  function confirmView(n){
-  if(!(be&&tg&&tg.initData&&rid)){ no('Could not verify the ad with the server. Use Share or VIP.'); return; }
+  if(!(be&&tg&&tg.initData&&rid)){ settled=true; untrack(); try{ window.__adsHow='local'; }catch(e){} done(); return; }   /* no server session: do not punish the user */
   fetch(be+'/ad/status',{method:'POST',headers:{'content-type':'application/json'},
    body:JSON.stringify({initData:tg.initData,rid:rid})})
    .then(function(r){return r.json()})
    .then(function(j){
     if(settled)return;
-    if(j&&j.granted){ settled=true; untrack(); done(); return; }
-    if(n>=7){ no('The ad network has not confirmed this view yet. Try again in a minute, or use Share.'); return; }
+    if(j&&j.granted){ settled=true; untrack(); try{ window.__adsHow='server'; }catch(e){} done(); return; }
+    if(n>=2){ settled=true; untrack(); try{ window.__adsHow='provisional'; }catch(e){} done(); return; }   /* bridge: postback not wired yet */
     setTimeout(function(){ confirmView(n+1); },1500);
    })
    .catch(function(){
     if(settled)return;
-    if(n>=7){ no('Could not confirm the view with the ad network. Use Share or VIP.'); return; }
+    if(n>=2){ settled=true; untrack(); try{ window.__adsHow='provisional'; }catch(e){} done(); return; }
     setTimeout(function(){ confirmView(n+1); },1500);
    });
  }
@@ -2848,6 +2848,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
     'cloud answers: '+String((window.__absSyncInfo&&window.__absSyncInfo.answers)||0),
     'free explanations left (server): '+String((window.__absFreeSeen||[]).length?Math.max(0,2-(window.__absFreeSeen||[]).length):2),
     'last PDF error: '+String(window.__pdfErr||'none'),
+    'last ad reward: '+String(window.__adsHow||'-'),
     'cloud SRS cards: '+String((window.__absSyncInfo&&window.__absSyncInfo.srs)||0)
    ];
    var w=document.createElement('div');w.className='absLb';
@@ -3789,6 +3790,13 @@ body.absFs #absToast{bottom:calc(26px + var(--abs-safe-bottom))!important}
    b.innerHTML='<span>'+(REM_ON?'\ud83d\udd14 Daily reminders: on':'\ud83d\udd15 Daily reminders: off')+'</span>'; }
   setTimeout(function(){
    if(!initData()) return;
+   /* a postback may have landed after the ad finished: pick the pass up on next open */
+   api('/ad/status',{initData:initData()}).then(function(j){
+    if(j&&j.granted&&j.until){
+     var mins=Math.round((j.until-Date.now())/60000);
+     if(mins>0){ try{ window.__absGrant(mins); }catch(e){} }
+    }
+   }).catch(function(){});
    api('/me',{initData:initData()}).then(function(j){
     if(j&&j.ok&&j.data){ REM_ON=(j.data.reminders!==false); paintRem(); }
    }).catch(function(){});

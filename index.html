@@ -1888,28 +1888,68 @@ function watchAd(done,fail){
   fail('No ad service ('+why+'). Use Share, or ask for VIP.');
   return;
  }
- var settled=false,t0=Date.now();
+ var tg=window.Telegram&&Telegram.WebApp, be=window.__absBackend,
+     uid=(window.AbsalamDB&&AbsalamDB.user&&AbsalamDB.user.id)||'', rid='';
+ var settled=false,t0=Date.now(),visMs=0,lastVis=(document.visibilityState==='visible')?Date.now():0;
+ function onVis(){
+  var now=Date.now();
+  if(document.visibilityState==='visible'){ lastVis=now; }
+  else if(lastVis){ visMs+=now-lastVis; lastVis=0; }
+ }
+ try{ document.addEventListener('visibilitychange',onVis); }catch(e){}
+ function untrack(){ try{ document.removeEventListener('visibilitychange',onVis); }catch(e){} }
+ function no(m){ if(settled)return; settled=true; untrack(); fail(m||'Ad could not be shown. Try again, or share the question instead.'); }
+
+ /* the server, not the SDK promise, decides whether the view was worth a reward */
+ function confirmView(n){
+  if(!(be&&tg&&tg.initData&&rid)){ no('Could not verify the ad with the server. Use Share or VIP.'); return; }
+  fetch(be+'/ad/status',{method:'POST',headers:{'content-type':'application/json'},
+   body:JSON.stringify({initData:tg.initData,rid:rid})})
+   .then(function(r){return r.json()})
+   .then(function(j){
+    if(settled)return;
+    if(j&&j.granted){ settled=true; untrack(); done(); return; }
+    if(n>=7){ no('The ad network has not confirmed this view yet. Try again in a minute, or use Share.'); return; }
+    setTimeout(function(){ confirmView(n+1); },1500);
+   })
+   .catch(function(){
+    if(settled)return;
+    if(n>=7){ no('Could not confirm the view with the ad network. Use Share or VIP.'); return; }
+    setTimeout(function(){ confirmView(n+1); },1500);
+   });
+ }
  function yes(){ if(settled)return;
-  var ms=Date.now()-t0; try{window.__adsLast=ms;}catch(e){}
-  if(ms<1200){ no('No ad was shown \u2014 you closed it too fast, so there is nothing to reward. Use Share or VIP.'); return; }
-  settled=true; done(); }
- function no(m){ if(settled)return; settled=true; fail(m||'Ad could not be shown. Try again, or share the question instead.'); }
- var p;
- try{ p=f(); }catch(e){ var e0='';try{e0=String((e&&(e.message||e))||'').slice(0,120)}catch(_){}
-  try{window.__adsLastErr=e0||'threw with no message'}catch(_){}
-  no('Ad could not start'+(e0?(': '+e0):'')+'. Use Share, or ask for VIP.'); return; }
- Promise.resolve(p).then(function(res){
-  /* Monetag resolves on ANY close, including an early one. Only 'valued' pays. */
-  var rt=res&&(res.reward_event_type||res.rewardEventType);
-  if(rt===undefined){ yes(); return; }              /* older SDK: fall back to the timer check */
-  if(rt==='valued'){ yes(); return; }
-  try{ window.__adsLastErr='closed early ('+rt+')'; }catch(e){}
-  no('You closed the ad early \u2014 no reward this time. Watch it to the end, or use Share.');
- },function(e){
-  var why='';try{why=String((e&&(e.message||e.reason||e.error||e))||'').slice(0,120)}catch(_){}
-  try{window.__adsLastErr=why||'no reason given'}catch(_){}
-  no('Ad could not be shown'+(why?(': '+why):'')+'. Try again in a minute, or use Share / VIP.');
- });
+  var ms=Date.now()-t0;
+  if(lastVis) visMs+=Date.now()-lastVis;
+  try{ window.__adsLast=ms; window.__adsVisible=Math.round(visMs); }catch(e){}
+  if(ms<1500){ untrack(); no('No ad was shown \u2014 you closed it too fast, so there is nothing to reward. Use Share or VIP.'); return; }
+  if(visMs<1500){ untrack(); no('That ad opened outside the app, so it was not watched. Use Share or VIP.'); return; }
+  confirmView(0);
+ }
+ function launch(){
+  var p;
+  try{ p = rid ? f({ymid:uid, requestVar:rid}) : f(); }
+  catch(e){ var e0='';try{e0=String((e&&(e.message||e))||'').slice(0,120)}catch(_){}
+   try{window.__adsLastErr=e0||'threw with no message'}catch(_){}
+   no('Ad could not start'+(e0?(': '+e0):'')+'. Use Share, or ask for VIP.'); return; }
+  Promise.resolve(p).then(function(res){
+   var rt=res&&(res.reward_event_type||res.rewardEventType);
+   if(rt===undefined){ yes(); return; }
+   if(rt==='valued'){ yes(); return; }
+   try{ window.__adsLastErr='closed early ('+rt+')'; }catch(e){}
+   no('You closed the ad early \u2014 no reward this time. Watch it to the end, or use Share.');
+  },function(e){
+   var why='';try{why=String((e&&(e.message||e.reason||e.error||e))||'').slice(0,120)}catch(_){}
+   try{window.__adsLastErr=why||'no reason given'}catch(_){}
+   no('Ad could not be shown'+(why?(': '+why):'')+'. Try again in a minute, or use Share / VIP.');
+  });
+ }
+ if(be&&tg&&tg.initData){
+  fetch(be+'/ad/start',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({initData:tg.initData})})
+   .then(function(r){return r.json()})
+   .then(function(j){ if(j&&j.rid) rid=j.rid; launch(); })
+   .catch(function(){ launch(); });
+ } else { launch(); }
 }
 /* ---- Share a question: picture card + tags; Telegram confirms the message was really sent ---- */
 function cardBlob(q,tags,code){
@@ -2450,11 +2490,18 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
    try{
     var doc=new J({unit:'mm',format:'a4'});
     var M=14,W=210-M*2,L='ABCDEFGHIJ';
-    var ACC=[11,79,82],ACC2=[18,144,139],INK=[26,35,48],MUT=[108,114,122],
-        LINE=[226,222,212],OKBG=[226,243,242],OKTX=[10,92,93];
+    var ACC=[11,79,82],ACC2=[18,144,139],INK=[26,35,48],MUT=[108,114,122],LINE=[226,222,212],CHIP=[236,243,243];
     var lab=pdfSafe(label), when=new Date();
-    var subjName=/Anatomy/i.test(lab)?'Anatomy':/Histolog/i.test(lab)?'Histology':'Physiology';
     function setC(a){ doc.setTextColor(a[0],a[1],a[2]); }
+    function subjOf(qn){ var c=String(qn||'').charAt(0); return c==='Q'?'Physiology':c==='A'?'Anatomy':c==='H'?'Histology':''; }
+    function tagLine(q){
+      var t=[];
+      if(q.topic) t.push(q.topic);
+      if(q.sub) t.push(q.sub);
+      if(q.src) t.push(q.src);
+      if(q.flag) t.push(String(q.flag).slice(0,60));
+      return t.join('  \u00b7  ');
+    }
 
     /* ---------------- cover ---------------- */
     doc.setFillColor(ACC[0],ACC[1],ACC[2]); doc.rect(0,0,210,96,'F');
@@ -2462,31 +2509,27 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(30);
     doc.text('Absalam',M,38);
     doc.setFont('helvetica','normal'); doc.setFontSize(12); doc.setTextColor(205,232,232);
-    doc.text('DIG 206  \u00b7  MCQ BANK',M,49);
-    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(255,255,255);
+    doc.text('DIG 206  \u00b7  MCQ PRACTICE SHEET',M,49);
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(255,255,255);
     doc.text(doc.splitTextToSize(lab,W),M,68);
     doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(200,228,228);
-    doc.text(subjName+'  \u00b7  '+list.length+' question'+(list.length===1?'':'s')+'  \u00b7  '+when.toLocaleDateString(),M,86);
+    doc.text(list.length+' questions  \u00b7  '+when.toLocaleDateString(),M,86);
 
     var by=M+104;
     doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.4);
-    doc.roundedRect(M,by,W,46,3,3,'S');
+    doc.roundedRect(M,by,W,40,3,3,'S');
     doc.setFont('helvetica','bold'); doc.setFontSize(9.5); setC(INK);
-    doc.text('INSIDE THIS EXPORT',M+6,by+9);
-    doc.setFont('helvetica','normal'); doc.setFontSize(8.8); setC(MUT);
-    var inside=[
-      'All '+list.length+' questions of this group, every option lettered.',
-      'The correct answer highlighted, with the full explanation for each item.',
-      'Topic and subtopic tags so you can see where the question comes from.',
-      'Questions marked disputed, unkeyed or cancelled are excluded unless you asked for them.'
+    doc.text('HOW TO USE THIS SHEET',M+6,by+8);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.7); setC(MUT);
+    var notes=[
+      'Questions are printed WITHOUT the answers marked \u2014 attempt them first.',
+      'A small answer key sits at the bottom of every page, printed upside down.',
+      'Full explanations, refutations of the wrong options and tags are at the back.'
     ];
-    var iy=by+17;
-    inside.forEach(function(t){
-      var ls=doc.splitTextToSize('\u2022  '+t,W-12);
-      doc.text(ls,M+6,iy); iy+=ls.length*4.3+1.1;
-    });
-    doc.setFontSize(7.6); setC(MUT);
-    doc.text('Source: Department Book 206  \u00b7  generated '+when.toLocaleString(),M,by+42);
+    var ny=by+15.5;
+    notes.forEach(function(t){ var ls=doc.splitTextToSize('\u2022  '+t,W-12); doc.text(ls,M+6,ny); ny+=ls.length*4.2+1; });
+    doc.setFontSize(7.4);
+    doc.text('Source: Department Book 206  \u00b7  generated '+when.toLocaleString(),M,by+36);
 
     /* ---------------- running header ---------------- */
     function header(){
@@ -2496,83 +2539,115 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
       doc.setFont('helvetica','normal'); doc.setFontSize(7.6);
       doc.text(String(doc.splitTextToSize(lab,120)[0]||''),210-M,7.8,{align:'right'});
     }
+
+    var keyPage=[[]], qPages=[];
+    function newPage(){ doc.addPage(); header(); y=22; keyPage.push([]); }
     doc.addPage(); header(); var y=22;
 
-    /* ---------------- question cards ---------------- */
+    /* ---------------- questions: no answers marked ---------------- */
     for(var i=0;i<list.length;i++){
       var q=list[i];
       doc.setFont('helvetica','bold'); doc.setFontSize(10.4);
       var stem=doc.splitTextToSize(pdfSafe(q.stem),W-16);
       doc.setFont('helvetica','normal'); doc.setFontSize(9.4);
-      var opts=(q.options||[]).map(function(o,ix){
-        return { t:doc.splitTextToSize(L[ix]+')  '+pdfSafe(o),W-24), ok:ix===q.answer };
-      });
-      var optH=0; opts.forEach(function(o){ optH+=o.t.length*4.1+3.0; });
-      doc.setFontSize(8.6);
-      var why=q.why?doc.splitTextToSize(pdfSafe(q.why),W-14):[];
-      var tagTxt=[q.topic,q.sub].filter(Boolean).join('   \u00b7   ');
-      var tags=tagTxt?doc.splitTextToSize(tagTxt,W-16):[];
-      var cardH=9+stem.length*4.8+2.5+optH+7+(why.length?why.length*3.9+8:0)+(tags.length?3.6+4:0)+5;
+      var opts=(q.options||[]).map(function(o,ix){ return doc.splitTextToSize(L[ix]+')  '+pdfSafe(o),W-24); });
+      var optH=0; opts.forEach(function(o){ optH+=o.length*4.1+2.6; });
+      var tl=tagLine(q); doc.setFontSize(7.6);
+      var tags=tl?doc.splitTextToSize(tl,W-16):[];
+      var cardH=9+stem.length*4.8+2.2+optH+4.5+(tags.length?4.2:0);
 
-      if(y+Math.min(cardH,250)>280){ doc.addPage(); header(); y=22; }
-      var top=y, drawH=Math.min(cardH,281-top);
+      if(y+Math.min(cardH,250)>276){ newPage(); }
+      var top=y, drawH=Math.min(cardH,277-top);
       doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.35);
       doc.roundedRect(M,top,W,drawH,3,3,'S');
-
       doc.setFillColor(ACC[0],ACC[1],ACC[2]); doc.roundedRect(M+3,top+3,9,9,2,2,'F');
       doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(8.4);
       doc.text(String(i+1),M+7.5,top+9.1,{align:'center'});
-
-      var tx=M+15;
       doc.setFont('helvetica','bold'); doc.setFontSize(10.4); setC(INK);
-      doc.text(stem,tx,top+8.6);
-      y=top+8.6+stem.length*4.8+1.6;
-
-      opts.forEach(function(o){
-        var oh=o.t.length*4.1+3.0;
-        if(o.ok){
-          doc.setFillColor(OKBG[0],OKBG[1],OKBG[2]);
-          doc.roundedRect(M+13,y-3.4,W-16,oh,2,2,'F');
-        }
-        doc.setFont('helvetica',o.ok?'bold':'normal'); doc.setFontSize(9.4);
-        if(o.ok) setC(OKTX); else setC(INK);
-        doc.text(o.t,M+17,y);
-        y+=oh;
-      });
-
-      y+=1.6;
-      var key=(q.answer>=0&&q.options&&q.options[q.answer])?L[q.answer]+') '+pdfSafe(q.options[q.answer]):'not keyed';
-      var kl=doc.splitTextToSize('\u2713  Correct answer:  '+key,W-18);
-      doc.setFont('helvetica','bold'); doc.setFontSize(8.8); setC(OKTX);
-      doc.text(kl,M+5,y); y+=kl.length*4.1;
-
-      if(why.length){
-        y+=2.6;
-        doc.setFont('helvetica','bold'); doc.setFontSize(7.4); setC(MUT);
-        doc.text('EXPLANATION',M+5,y); y+=4.0;
-        doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setC(INK);
-        for(var k=0;k<why.length;k++){
-          if(y>283){ doc.addPage(); header(); y=22; }
-          doc.text(why[k],M+5,y); y+=3.9;
-        }
-      }
-      if(tags.length){
-        y+=1.4;
-        doc.setFont('helvetica','italic'); doc.setFontSize(7.5); setC(MUT);
-        doc.text(tags,M+5,y); y+=3.6;
-      }
-      y+=5;
+      doc.text(stem,M+15,top+8.6);
+      y=top+8.6+stem.length*4.8+1.4;
+      opts.forEach(function(o){ doc.setFont('helvetica','normal'); doc.setFontSize(9.4); setC(INK); doc.text(o,M+17,y); y+=o.length*4.1+2.6; });
+      if(tags.length){ y+=0.8; doc.setFont('helvetica','italic'); doc.setFontSize(7.6); setC(MUT); doc.text(tags,M+5,y); y+=4.2; }
+      y+=4.5;
+      keyPage[keyPage.length-1].push(String(i+1)+' '+((q.answer>=0&&q.answer!=null)?L[q.answer]:'-'));
     }
 
-    /* ---------------- footers ---------------- */
+    /* ---------------- answers, explanations, refutations ---------------- */
+    doc.addPage(); header(); y=24;
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); setC(INK);
+    doc.text('ANSWERS, EXPLANATIONS AND REFUTATIONS',M,y); y+=6.5;
+
+    /* compact answer key for the whole set */
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.4); setC(MUT);
+    doc.text('ANSWER KEY',M,y); y+=4.6;
+    var cols=6, colW=W/cols;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.4); setC(INK);
+    for(var r=0;r<Math.ceil(list.length/cols);r++){
+      if(y>272){ doc.addPage(); header(); y=24; }
+      for(var c=0;c<cols;c++){
+        var ii=r*cols+c; if(ii>=list.length) break;
+        var qq2=list[ii];
+        var ans=(qq2.answer>=0&&qq2.answer!=null)?L[qq2.answer]:'\u2013';
+        doc.text(String(ii+1)+'  '+ans, M+c*colW, y);
+      }
+      y+=4.4;
+    }
+    y+=2.4;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); setC(MUT);
+    doc.text('Each item below repeats the key, explains the correct option and why the others fail.',M,y); y+=7;
+
+    function need(h){ if(y+h>276){ doc.addPage(); header(); y=24; } }
+    for(var a=0;a<list.length;a++){
+      var qq=list[a];
+      doc.setFont('helvetica','bold'); doc.setFontSize(9.6);
+      var key=(qq.answer>=0&&qq.answer!=null&&qq.options&&qq.options[qq.answer])?L[qq.answer]+') '+pdfSafe(qq.options[qq.answer]):'not keyed';
+      var head=(a+1)+'.  '+subjOf(qq.num)+' '+String(qq.num||'')+'  \u2014  '+key;
+      var hl=doc.splitTextToSize(head,W);
+      need(hl.length*4.4+4);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9.6); setC(ACC2);
+      doc.text(hl,M,y); y+=hl.length*4.4+1.2;
+
+      if(qq.why){
+        doc.setFont('helvetica','normal'); doc.setFontSize(8.4); setC(INK);
+        var wl=doc.splitTextToSize(pdfSafe(String(qq.why)),W-4);
+        for(var w1=0;w1<wl.length;w1++){ if(y>273){ doc.addPage(); header(); y=24; } doc.text(wl[w1],M,y); y+=3.9; }
+        y+=1.4;
+      }
+      var wr=qq.wrong||{};
+      var keys=Object.keys(wr).sort(function(x,z){ return Number(x)-Number(z); });
+      if(keys.length){
+        need(5);
+        doc.setFont('helvetica','bold'); doc.setFontSize(7.4); setC(MUT);
+        doc.text('WHY THE OTHER OPTIONS FAIL',M,y); y+=3.8;
+        for(var k2=0;k2<keys.length;k2++){
+          var idx=Number(keys[k2]);
+          var line='\u2717  '+L[idx]+')  '+pdfSafe(String(wr[keys[k2]]));
+          var ll=doc.splitTextToSize(line,W-4);
+          if(y+ll.length*3.8>273){ doc.addPage(); header(); y=24; }
+          doc.setFont('helvetica','normal'); doc.setFontSize(8.2); setC(INK);
+          doc.text(ll,M+3,y); y+=ll.length*3.8+0.8;
+        }
+        y+=1.2;
+      }
+      var tl2=tagLine(qq);
+      if(tl2){
+        var tgl=doc.splitTextToSize(tl2,W-4);
+        if(y+tgl.length*3.6>273){ doc.addPage(); header(); y=24; }
+        doc.setFont('helvetica','italic'); doc.setFontSize(7.3); setC(MUT);
+        doc.text(tgl,M,y); y+=tgl.length*3.6;
+      }
+      y+=3.4;
+      doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.2);
+      if(y<273) doc.line(M,y-1.6,210-M,y-1.6);
+    }
+
+    /* ---------------- page numbers ---------------- */
     var total=doc.internal.getNumberOfPages();
-    for(var p=2;p<=total;p++){
-      doc.setPage(p);
-      doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.3);
-      doc.line(M,288,210-M,288);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.4); setC(MUT);
+    for(var p2=2;p2<=total;p2++){
+      doc.setPage(p2);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.2); setC(MUT);
       doc.text('Absalam  \u00b7  DIG 206',M,292);
-      doc.text('page '+p+' of '+total,210-M,292,{align:'right'});
+      doc.text('page '+p2+' of '+total,210-M,292,{align:'right'});
     }
 
     var name='Absalam-'+String(label).replace(/[^A-Za-z0-9]+/g,'-').slice(0,40)+'-'+new Date().toISOString().slice(0,10)+'.pdf';
@@ -2765,6 +2840,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
     'device online: '+(navigator.onLine===false?'NO':'yes'),
     're-fetch attempts: '+String(window.__adsTries==null?'-':window.__adsTries),
     'last ad duration: '+(window.__adsLast?window.__adsLast+' ms':'never shown'),
+    'time the app was on screen: '+(window.__adsVisible==null?'-':window.__adsVisible+' ms'),
     'last refusal: '+(window.__adsLastErr||'none yet'),
     'Telegram context: '+(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData?'yes':'no'),
     'account id: '+String((window.AbsalamDB&&AbsalamDB.user&&AbsalamDB.user.id)||'-')+(String((window.AbsalamDB&&AbsalamDB.user&&AbsalamDB.user.id)||'').indexOf('guest_')===0?'  (GUEST - not syncing)':''),

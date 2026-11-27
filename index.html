@@ -2452,8 +2452,8 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
     var M=14,W=210-M*2,L='ABCDEFGHIJ';
     var ACC=[11,79,82],ACC2=[18,144,139],INK=[26,35,48],MUT=[108,114,122],
         LINE=[226,222,212],OKBG=[226,243,242],OKTX=[10,92,93];
-    var subjName=({phys:'Physiology',anat:'Anatomy',histo:'Histology'})[SUBJ]||'';
     var lab=pdfSafe(label), when=new Date();
+    var subjName=/Anatomy/i.test(lab)?'Anatomy':/Histolog/i.test(lab)?'Histology':'Physiology';
     function setC(a){ doc.setTextColor(a[0],a[1],a[2]); }
 
     /* ---------------- cover ---------------- */

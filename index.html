@@ -3,6 +3,41 @@
 <head>
 <!-- Telegram Mini App SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script id="absBootJs">
+(function(){'use strict';
+ var W=window, sdk='official';
+ /* 1. No SDK (cold start without network)? Rebuild Telegram.WebApp from the launch params Telegram puts in the URL hash, as the real SDK does. */
+ try{
+  if(!(W.Telegram&&W.Telegram.WebApp)){
+   sdk='fallback';
+   var P={}, SK='__telegram__initParams', saved=null;
+   try{ new URLSearchParams(String(location.hash||'').replace(/^#/,'')).forEach(function(v,k){ P[k]=v; }); }catch(e){}
+   try{ saved=JSON.parse(sessionStorage.getItem(SK)||'null'); }catch(e){}
+   if(saved){ for(var k in saved){ if(P[k]===undefined) P[k]=saved[k]; } }
+   try{ sessionStorage.setItem(SK,JSON.stringify(P)); }catch(e){}
+   var init=P.tgWebAppData||'', U={}, th={}, no=function(){}, z={top:0,bottom:0,left:0,right:0};
+   try{ new URLSearchParams(init).forEach(function(v,k){ U[k]=v; }); if(U.user) U.user=JSON.parse(U.user); }catch(e){}
+   try{ th=JSON.parse(P.tgWebAppThemeParams||'{}'); }catch(e){}
+   W.Telegram=W.Telegram||{};
+   W.Telegram.WebApp={initData:init,initDataUnsafe:U,version:P.tgWebAppVersion||'6.0',platform:P.tgWebAppPlatform||'unknown',themeParams:th,
+    colorScheme:'light',isExpanded:true,isFullscreen:false,safeAreaInset:z,contentSafeAreaInset:z,
+    ready:no,expand:no,close:no,onEvent:no,offEvent:no,requestFullscreen:no,exitFullscreen:no,enableVerticalSwipes:no,disableVerticalSwipes:no,
+    openTelegramLink:function(u){ try{ W.open(u,'_blank'); }catch(e){} }};
+  }
+ }catch(e){}
+ W.__absSdk=sdk;
+ /* 2. Register the service worker now (it used to wait for window.load + 1.2 s, so a quick open/close never installed it). */
+ W.__absRegSW=function(){
+  try{
+   if(!('serviceWorker' in navigator)) return;
+   if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1') return;
+   navigator.serviceWorker.register('absalam_sw.js',{updateViaCache:'none'}).then(function(r){ W.__absSwReg=r; },function(e){ W.__absSwErr=String(e&&e.message||e); });
+  }catch(e){}
+ };
+ W.__absBoot={ctrl:!!(navigator.serviceWorker&&navigator.serviceWorker.controller)};
+ W.__absRegSW();
+})();
+</script>
 <!-- Monetag Telegram Mini App SDK (zone 12344340) -->
 <script src="https://libtl.com/sdk.js" data-zone="12344340" data-sdk="show_12344340"></script>
 
@@ -2207,7 +2242,7 @@ function cardBlob(q,tags,code){
    if(d){var fg=c.createLinearGradient(M,y,W-M,y+196);fg.addColorStop(0,'#0f1d2b');fg.addColorStop(1,'#0e3a40');c.fillStyle=fg;rr(M,y,W-2*M,196,32);c.fill();
     c.fillStyle='#7fd6d0';c.font='700 26px '+UI;c.fillText('THINK YOU KNOW IT?',M+44,y+58);
     c.fillStyle='#fff';c.font='800 44px '+UI;c.fillText('Solve it in @'+BOT,M+44,y+118);
-    c.fillStyle='#8fa3ad';c.font='500 24px '+UI;c.fillText(code?('Send /start '+code+' to this bot'):'Answer + explanation inside',M+44,y+160)}
+    c.fillStyle='#8fa3ad';c.font='500 24px '+UI;c.fillText('Answer + explanation inside',M+44,y+160)}
    return y+196+M;
   }
   var H=900;
@@ -3142,7 +3177,7 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
     'last PDF error: '+String(window.__pdfErr||'none'),
     'last ad reward: '+String(window.__adsHow||'-'),
     'cloud SRS cards: '+String((window.__absSyncInfo&&window.__absSyncInfo.srs)||0)
-   ];
+   ].concat(window.__absOffDiag?window.__absOffDiag():[]);
    var w=document.createElement('div');w.className='absLb';
    w.innerHTML='<div class="absLbCard"><h3>\ud83d\udd0d Ad check</h3>'+
     lines.map(function(x){return '<p class="absLbNote" style="margin:4px 0;word-break:break-word">'+x+'</p>'}).join('')+
@@ -4369,15 +4404,9 @@ body.absFs #absToast{bottom:calc(26px + var(--abs-safe-bottom))!important}
 (function(){'use strict';
  if(!('serviceWorker' in navigator)) return;
  if(location.protocol!=='https:' && location.hostname!=='localhost' && location.hostname!=='127.0.0.1') return;
- var done=false;
- function reg(){
-  if(done) return; done=true;
-  navigator.serviceWorker.register('absalam_sw.js').catch(function(){ done=false; });
- }
- if(document.readyState==='complete') setTimeout(reg,1200); else window.addEventListener('load',function(){ setTimeout(reg,1200); });
- setTimeout(reg,4000);
- window.addEventListener('online',function(){ done=false; reg(); });
- document.addEventListener('visibilitychange',function(){ if(!document.hidden && !navigator.serviceWorker.controller){ done=false; reg(); } });
+ function reg(){ if(window.__absRegSW) window.__absRegSW(); }   /* first registration now happens in <head> (absBootJs) */
+ window.addEventListener('online',reg);
+ document.addEventListener('visibilitychange',function(){ if(!document.hidden && !navigator.serviceWorker.controller) reg(); });
  setInterval(function(){
   if(navigator.onLine || navigator.serviceWorker.controller) return;
   var bar=document.getElementById('absOffBar');
@@ -4493,6 +4522,54 @@ body.absFs #absToast{bottom:calc(26px + var(--abs-safe-bottom))!important}
   jump(c.dataset.n || c.dataset.no);
  },true);
  window.__absCellJump=jump;
+})();
+</script>
+<script id="absOffDiagJs">
+(function(){'use strict';
+ var info={sw:'checking',cache:'checking'};
+ function gather(){
+  try{
+   if(!('serviceWorker' in navigator)) info.sw='not available in this webview';
+   else navigator.serviceWorker.getRegistration().then(function(r){
+    info.sw=!r?'not registered yet':(navigator.serviceWorker.controller?'active and controlling this page':(r.active?'active, not controlling yet (reopen the app once)':'installing'));
+   },function(){ info.sw='error'; });
+   if(window.caches) caches.keys().then(function(ks){
+    var k=ks.filter(function(x){ return x.indexOf('absalam-')===0; })[0];
+    if(!k){ info.cache='nothing saved'; return; }
+    return caches.open(k).then(function(c){ return c.keys(); }).then(function(l){
+     info.cache=k+', '+l.length+' files, page '+(l.some(function(q){ return /index\.html$/.test(q.url); })?'saved':'MISSING');
+    });
+   }).catch(function(){ info.cache='error'; });
+   else info.cache='Cache Storage not available';
+  }catch(e){}
+ }
+ gather(); setTimeout(gather,4000); setTimeout(gather,12000);
+ window.__absOffDiag=function(){
+  var n=null; try{ n=performance.getEntriesByType('navigation')[0]; }catch(e){}
+  var how='network';
+  if((window.__absBoot&&window.__absBoot.ctrl)||(n&&n.workerStart>0)) how='service worker';
+  else if(n&&n.transferSize===0&&n.responseEnd>0) how='HTTP cache';
+  return [
+   '--- offline check ---',
+   'LAUNCH served by: '+how,
+   'service worker: '+info.sw+(window.__absSwErr?' ('+window.__absSwErr+')':''),
+   'saved offline: '+info.cache,
+   'Telegram SDK: '+(window.__absSdk==='fallback'?'FALLBACK - official script did not load':'official'),
+   'launch URL has a query string: '+(location.search?'yes':'no')
+  ];
+ };
+ /* no service worker here (iPhone webview): keep the HTTP-cached copy of the page fresh for the next cold start */
+ window.addEventListener('load',function(){ setTimeout(function(){
+  try{
+   if(navigator.onLine===false) return;
+   if('serviceWorker' in navigator && navigator.serviceWorker.controller) return;
+   fetch(location.href.split('#')[0],{cache:'no-cache'}).then(function(r){
+    if(!r||!r.ok||!r.body||!r.body.getReader) return;
+    var rd=r.body.getReader();
+    (function pump(){ return rd.read().then(function(d){ if(!d.done) return pump(); }); })();
+   }).catch(function(){});
+  }catch(e){}
+ },6000); });
 })();
 </script>
 </body>

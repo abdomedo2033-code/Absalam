@@ -1,0 +1,24 @@
+# Cloudflare Pages header rules — offline survival for the Telegram Mini App.
+# GitHub Pages cannot set headers, which is why a cold start offline shows
+# "No internet connection": its cache entry is only fresh for 10 minutes.
+#
+# Put this file in the SAME folder as index.html on Cloudflare Pages.
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+/*
+  X-Content-Type-Options: nosniff
+
+# the app shell: keep it fresh for a day so the browser can serve it offline
+/index.html
+  Cache-Control: public, max-age=86400
+
+/
+  Cache-Control: public, max-age=86400
+
+# the service worker itself must never be cached for long, or updates stall
+/absalam_sw.js
+  Cache-Control: public, max-age=600
+
+# any other static asset
+/*.js
+  Cache-Control: public, max-age=86400

@@ -7,7 +7,7 @@
  */
 'use strict';
 
-var VERSION = 'absalam-v4';
+var VERSION = 'absalam-v5';
 var SCOPE = self.registration.scope;
 var SHELL_KEY = new URL('index.html', SCOPE).href;
 var SHELL_SRC = [SCOPE, SHELL_KEY];
@@ -125,7 +125,7 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;                  /* POSTs go straight to the network */
   var url = new URL(req.url), host = url.hostname;
 
-  if (/workers\.dev$/.test(host)) {                  /* API: network only, but fail softly so the app can queue */
+  if (/workers\.dev$/.test(host) && url.origin !== location.origin) {   /* API only — never our own host */
     e.respondWith(fetch(req).catch(function () {
       return new Response(JSON.stringify({ ok: false, offline: true }), { status: 503, headers: { 'content-type': 'application/json' } });
     }));

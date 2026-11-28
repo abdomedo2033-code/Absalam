@@ -18,7 +18,3 @@
 # the service worker itself must never be cached for long, or updates stall
 /absalam_sw.js
   Cache-Control: public, max-age=600
-
-# any other static asset
-/*.js
-  Cache-Control: public, max-age=86400

@@ -2261,7 +2261,7 @@ function startShare(q,gate,cb){
    if(s&&s.ok){track();
     if(s.photo===false){ try{toast('\u26a0 Card sent WITHOUT the image \u2014 the picture could not be attached')}catch(e){} }
     try{tg.openTelegramLink('https://t.me/'+BOT)}catch(e){}
-    cb('wait','Card sent to your chat with @'+BOT+(j.code?(' \u00b7 code '+j.code):'')+'. Forward it \u2014 or post the picture in a group: classmates type /start '+(j.code||'CODE')+' in @'+BOT+'.');return}
+    cb('wait','Card sent to your chat with @'+BOT+'. Forward it \u2014 or post the picture in a group.');return}
    if(s&&s.error==='start_bot'){cb('err','Open @'+BOT+', press Start, then tap Share again.');try{tg.openTelegramLink('https://t.me/'+BOT+'?start=share')}catch(e){}return}
    /* fallback: normal link message (some groups delete links) */
    track();var url='https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(shareText(q));
@@ -3268,13 +3268,10 @@ wrap('hideAns',function(el){var x=el.querySelector('.dk');if(x)x.remove()});
   var w=document.createElement('div'); w.className='absLb'; w.id='absShareFb';
   w.innerHTML='<div class="absLbCard"><h3>Share this question</h3>'+
    '<div id="absShareImg" style="margin:8px 0;text-align:center;color:var(--mut);font:400 12px var(--ui)">Preparing image…</div>'+
-   '<p class="absLbNote">Long-press the image to save it, then send it to your group with the link below.</p>'+
-   '<p class="absLbNote" id="absShareLink" style="word-break:break-all"></p>'+
+   '<p class="absLbNote">Long-press the image to save it, then send it to your group.</p>'+
 
    '<button class="btn absLbClose" type="button">Close</button></div>';
   document.body.appendChild(w);
-  var linkEl=w.querySelector('#absShareLink');
-  if(linkEl) linkEl.textContent=(typeof APPLINK!=='undefined'?APPLINK:'');
   try{
    var tags=[];try{ if(typeof tagsOf==='function') tags=tagsOf(q); }catch(e){}
    if(typeof cardBlob==='function') cardBlob(q,tags).then(function(b){
@@ -4378,6 +4375,17 @@ body.absFs #absToast{bottom:calc(26px + var(--abs-safe-bottom))!important}
   navigator.serviceWorker.register('absalam_sw.js').catch(function(){ done=false; });
  }
  if(document.readyState==='complete') setTimeout(reg,1200); else window.addEventListener('load',function(){ setTimeout(reg,1200); });
+ setTimeout(reg,4000);
+ window.addEventListener('online',function(){ done=false; reg(); });
+ document.addEventListener('visibilitychange',function(){ if(!document.hidden && !navigator.serviceWorker.controller){ done=false; reg(); } });
+ setInterval(function(){
+  if(navigator.onLine || navigator.serviceWorker.controller) return;
+  var bar=document.getElementById('absOffBar');
+  if(bar && !bar.dataset.nocache){
+   bar.dataset.nocache='1';
+   bar.textContent='\ud83d\udcf4 Offline and not fully cached \u2014 open the app once while online to enable offline mode';
+  }
+ },3000);
 })();
 </script>
 
